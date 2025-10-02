@@ -27,8 +27,9 @@ get_most_frequent_tokens(
 A tibble with columns 'token' and 'n' (count), sorted by frequency.
 }
 \description{
-Takes a list of character vectors (tokenized documents), removes standard English stopwords,
+Takes a list of character vectors, removes stopwords,
 and returns a tibble of the most frequent tokens and their counts.
+Words to be removed can be standard stopwords (from stopwords/quanteda) or a custom list.
 }
 \examples{
 \dontrun{

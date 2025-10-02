@@ -1,8 +1,7 @@
 #' Preprocess a text corpus for embedding.
 #'
-#' Reads a text file, performs bigram and trigram substitution (using a
-#' helper function \code{create_bigrams} which is assumed to be available
-#' in the environment), and tokenizes the resulting text. Optionally, it
+#' Reads a text file, performs bigram and trigram substitution (using the
+#' function \code{create_bigrams}), and tokenizes the resulting text. Optionally, it
 #' subsamples the data.
 #'
 #' @param data A speakers_text object generated with \code{prepare_data()} or a character string specifying the path to the text file

@@ -46,8 +46,8 @@ The model is also saved to disk at the path specified by \code{output_file}.
 }
 \description{
 This function orchestrates the entire training pipeline for a skip-gram Word2Vec
-model. It first preprocesses the raw text data (using the assumed \code{preprocess_data}
-function), trains the model with specified parameters, and finally saves the resulting
+model. It first preprocesses the raw text data (using the \code{preprocess_data}
+function), trains the model, and finally saves the resulting
 vector embeddings to a specified file path.
 }
 \details{

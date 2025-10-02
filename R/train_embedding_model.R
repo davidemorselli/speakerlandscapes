@@ -1,8 +1,8 @@
 #' Train a Word2Vec Embedding Model from Raw Text Data
 #'
 #' This function orchestrates the entire training pipeline for a skip-gram Word2Vec
-#' model. It first preprocesses the raw text data (using the assumed \code{preprocess_data}
-#' function), trains the model with specified parameters, and finally saves the resulting
+#' model. It first preprocesses the raw text data (using the \code{preprocess_data}
+#' function), trains the model, and finally saves the resulting
 #' vector embeddings to a specified file path.
 #'
 #' @param file_path A character string specifying the path to the raw input text file. The file should contain speaker identifier as the first token of each line in. Speakers identifiers should start with a non equivocal token (e.g., speaker_ID1, speaker_ID2, ...), see \code{prepare_data()}

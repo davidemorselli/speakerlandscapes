@@ -6,10 +6,9 @@
 #' for dimensionality reduction. It processes and returns the UMAP coordinates for
 #' both the filtered speakers and a set of input tokens for visualization.
 #'
-#' @param data The input source. Can be a character string specifying the path to
-#'   the space-separated file OR a character vector where each element is a line
-#'   of text (in which case its class must be set to \code{"speakers_text"}).
-#'   The first token is assumed to be the speaker ID, and the rest forms the text.
+#' @param data The input source. Can be either a character string specifying the path to
+#'   the file contianing text (The first token is assumed to be the speaker ID, and the rest forms the text.) OR an object of class \code{"speakers_text"} as create with \code{prepare_data()}).
+#'
 #' @param embedding A pre-trained vector embeddings object (e.g., a matrix of
 #'   word2vec embeddings) where \code{rownames} contain the tokens/speakers being mapped.
 #' @param tokens_to_plot A data frame or tibble with a column named \code{token}

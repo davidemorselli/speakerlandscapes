@@ -1,6 +1,6 @@
 #' Identify and combine the most frequent, non-stopword bigrams in a text column.
 #'
-#' This function analyzes a text column in a data frame, identifies the top \code{n_bigrams}
+#' It analyzes a text column in a data frame, identifies the top \code{n_bigrams}
 #' most frequent bigrams (two consecutive words), filters out those containing
 #' common stop words, and replaces the identified bigrams in the text with a single
 #' token where the words are joined by an underscore (e.g., "new york" becomes "new_york").

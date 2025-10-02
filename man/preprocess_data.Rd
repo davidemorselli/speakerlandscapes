@@ -31,9 +31,8 @@ tokenized line (i.e., a list of words). If \code{share_data < 1.0},
 this list will be a random subsample of the lines.
 }
 \description{
-Reads a text file, performs bigram and trigram substitution (using a
-helper function \code{create_bigrams} which is assumed to be available
-in the environment), and tokenizes the resulting text. Optionally, it
+Reads a text file, performs bigram and trigram substitution (using the
+function \code{create_bigrams}), and tokenizes the resulting text. Optionally, it
 subsamples the data.
 }
 \details{
