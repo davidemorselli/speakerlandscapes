@@ -21,3 +21,5 @@ Imports:
     quanteda,
     tibble,
     tidytext
+URL: https://github.com/davidemorselli/speakerlandscapes
+BugReports: https://github.com/davidemorselli/speakerlandscapes/issues
