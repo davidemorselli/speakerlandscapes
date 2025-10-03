@@ -1,11 +1,7 @@
 #' Get Most Frequent Tokens from a Token List (with Stopword Removal using quanteda)
 #'
 #' Takes a list of character vectors, removes stopwords,
-<<<<<<< HEAD
 #' and returns a tibble of the most frequent tokens and their counts.
-=======
-#' and returns a tibble of the most frequent tokens and their counts.
->>>>>>> ffdbbfbf087ca41a4c389908e4d45b4b513cdc19
 #' Words to be removed can be standard stopwords (from stopwords/quanteda) or a custom list.
 #'
 #' @param token_list A list of character vectors (tokenized documents).
