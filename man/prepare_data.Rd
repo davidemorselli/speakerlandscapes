@@ -20,7 +20,7 @@ Defaults to \code{"text"}.}
 
 \item{speaker_id_column}{The unquoted column name in \code{data} containing the
 unique identifier for the agent or speaker (e.g., \code{author} or \code{user_id}).
-Defaults to \code{"author"}.}
+Defaults to \code{"author"}. Note: it is transposed to low case.}
 
 \item{speaker_identifier}{A character string prefix used to construct the
 final speaker token. For example, if this is \code{"speaker"} and the

@@ -5,7 +5,7 @@
 \title{Get Most Frequent Tokens from a Token List (with Stopword Removal using quanteda)}
 \usage{
 get_most_frequent_tokens(
-  token_list,
+  data,
   n_top = 100,
   min_count = 100,
   stopword_language = "en",
@@ -13,8 +13,6 @@ get_most_frequent_tokens(
 )
 }
 \arguments{
-\item{token_list}{A list of character vectors (tokenized documents).}
-
 \item{n_top}{The number of top tokens to return. Defaults to 100.}
 
 \item{min_count}{The minimum number of times a token must appear. Defaults to 100.}
@@ -22,6 +20,8 @@ get_most_frequent_tokens(
 \item{stopword_language}{The language for the stopwords. Defaults to "en".}
 
 \item{custom_stopwords}{A character vector of additional stop words to remove.}
+
+\item{token_list}{A list of character vectors (tokenized documents).}
 }
 \value{
 A tibble with columns 'token' and 'n' (count), sorted by frequency.

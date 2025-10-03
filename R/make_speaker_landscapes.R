@@ -41,7 +41,7 @@
 #' input is treated as an inline character vector; otherwise, it is treated as a file path.
 #'
 #' @importFrom umap umap
-#' @importFrom dplyr %>% mutate rowwise c_across group_by summarise ungroup select rename filter left_join
+#' @importFrom dplyr %>% mutate rowwise c_across group_by summarise n ungroup select rename filter left_join
 #' @importFrom readr read_delim
 #'
 #' @examples
