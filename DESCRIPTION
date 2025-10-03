@@ -1,0 +1,25 @@
+Package: speakerlandscapes
+Title: Speaker Landscape Analysis: Vector Space Mapping and Visualization
+Version: 0.0.0.9000
+Authors@R: 
+    person("Davide", "Morselli", , "davide.morselli@unil.ch", role = c("aut", "cre"))
+Description: Computing and visualizing speaker landscapes, vector representation of speakers based on their similar semantics, as outlined in Schuld, Durrheim & Mafunda (2024). The procedure transforms raw text into a high-dimensional vector space using Word2Vec and subsequently reduces the data to a 2D "landscape" using UMAP for visual interpretation. For further infomration see: Schuld, M., Durrheim, K., & Mafunda, M. (2024). Speaker landscapes: Machine learning opens a window on the everyday language of opinion. Communication Methods and Measures, 18(4), 315-331.
+License: CC0
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    dplyr,
+    ggplot2,
+    purrr,
+    readr,
+    stopwords,
+    stringr,
+    tidyr,
+    umap,
+    word2vec,
+    quanteda,
+    tibble,
+    tidytext
+URL: https://github.com/davidemorselli/speakerlandscapes
+BugReports: https://github.com/davidemorselli/speakerlandscapes/issues
