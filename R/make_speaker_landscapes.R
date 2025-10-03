@@ -127,7 +127,10 @@ make_speaker_landscapes <- function(
       quote = paste(c_across(X2:last_col()), collapse = " ")
     ) %>%
     ungroup() %>%
-    select(author, quote)
+    select(author, quote) %>%
+    mutate(author=tolower(author),
+           quote=tolower(quote)
+           )
 
   # Summarise quotes for each speaker
   df_grouped <- df %>%
