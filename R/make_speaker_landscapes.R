@@ -15,9 +15,9 @@
 #'   containing a character vector of tokens (e.g., important words) whose
 #'   embeddings should also be reduced and plotted as labels.
 #' @param speaker_identifier A character string prefix used to identify the
-#'   speaker tokens. This is used in the internal filtering step. Defaults to \code{"speaker"}.
+#'   speaker tokens. This is used in the internal filtering step and it is transposed to low case. Defaults to \code{"speaker"}.
 #' @param retain_threshold An integer threshold for the minimum number of
-#'   quotes a speaker must have to be included in the final plot. Defaults to \code{5}.
+#'   quotes a speaker must have to be included in the final plot. Defaults to \code{1}.
 #' @param umap_seed An integer seed for the random number generator used by UMAP
 #'   to ensure reproducibility. Defaults to \code{42}.
 #' @param n_neighbors An integer specifying the number of nearest neighbors for
@@ -90,12 +90,12 @@ make_speaker_landscapes <- function(
     embedding = NULL,
     tokens_to_plot = NULL,
     speaker_identifier = "speaker",
-    retain_threshold = 5,
+    retain_threshold = 1,
     umap_seed = 42,
     n_neighbors = 40,
     min_dist = 0.01
 ) {
-
+  speaker_identifier = tolower(speaker_identifier)
   # --- Load and process the data ---
   if (class(data) == "speakers_text") {
     # Treat data as an inline character vector
@@ -143,11 +143,11 @@ make_speaker_landscapes <- function(
   # Filter based on the retention threshold
   df_filtered <- df_grouped %>%
     select(author, n_quotes) %>%
-    filter(n_quotes > retain_threshold)
+    filter(n_quotes >= retain_threshold)
 
   print(
     paste(
-      "Number of speakers with more than",
+      "Number of speakers with at least",
       retain_threshold,
       "texts:",
       nrow(df_filtered)

@@ -11,7 +11,7 @@
 #'   Defaults to \code{"text"}.
 #' @param speaker_id_column The unquoted column name in \code{data} containing the
 #'   unique identifier for the agent or speaker (e.g., \code{author} or \code{user_id}).
-#'   Defaults to \code{"author"}.
+#'   Defaults to \code{"author"}. Note: it is transposed to low case.
 #' @param speaker_identifier A character string prefix used to construct the
 #'   final speaker token. For example, if this is \code{"speaker"} and the
 #'   \code{speaker_id_column} value is \code{"ID_001"}, the final token will be
@@ -49,6 +49,8 @@ prepare_data <- function(data,
                          text_column = "text",
                          speaker_id_column = "author",
                          speaker_identifier = "speaker") {
+
+  speaker_identifier = tolower(speaker_identifier)
 
   # Use the column names dynamically and ensure they are selected first
   data_processed <- data %>%

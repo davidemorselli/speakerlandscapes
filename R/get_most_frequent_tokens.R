@@ -41,7 +41,7 @@ get_most_frequent_tokens <- function(data, n_top = 100, min_count = 100, stopwor
 
   # 1. Convert the list of vectors into a quanteda tokens object
   # quanteda::tokens() is designed to handle lists of character vectors efficiently.
-  token_list <- preprocess(data)
+  token_list <- preprocess_data(data)
 
   # Check if the list is empty
   if (length(token_list) == 0 || all(sapply(token_list, length) == 0)) {
