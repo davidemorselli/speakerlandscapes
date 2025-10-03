@@ -84,7 +84,10 @@
 #' # 3. Plot the result (requires plot_speaker_landscapes function)
 #' # plot_speaker_landscapes(landscape_data)
 #' }
+<<<<<<< HEAD
 #' @export
+=======
+>>>>>>> ffdbbfbf087ca41a4c389908e4d45b4b513cdc19
 make_speaker_landscapes <- function(
     data,
     embedding = NULL,

@@ -44,7 +44,10 @@
 #' )
 #' print(processed_text)
 #' }
+<<<<<<< HEAD
 #' @export
+=======
+>>>>>>> ffdbbfbf087ca41a4c389908e4d45b4b513cdc19
 prepare_data <- function(data,
                          text_column = "text",
                          speaker_id_column = "author",

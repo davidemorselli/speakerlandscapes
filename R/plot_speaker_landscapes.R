@@ -43,7 +43,10 @@
 #' )
 #' plot_speaker_landscapes(landscape_data, categories = speaker_categories)
 #' }
+<<<<<<< HEAD
 #' @export
+=======
+>>>>>>> ffdbbfbf087ca41a4c389908e4d45b4b513cdc19
 plot_speaker_landscapes <- function(speaker_landscape,
                                     size_points = .3,
                                     alpha_points = .3,

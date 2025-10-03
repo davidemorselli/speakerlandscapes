@@ -56,7 +56,10 @@
 #' # You can then access the embeddings:
 #' # embedding_matrix <- as.matrix(trained_model)
 #' }
+<<<<<<< HEAD
 #' @export
+=======
+>>>>>>> ffdbbfbf087ca41a4c389908e4d45b4b513cdc19
 train_embedding_model <- function(
     file_path,
     output_file = "embeddings.emb",
