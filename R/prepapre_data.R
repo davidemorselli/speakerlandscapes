@@ -58,7 +58,7 @@ prepare_data <- function(data,
     dplyr::mutate(speaker = paste(speaker_identifier, author, sep = "_")) %>%
 
     # 2. Concatenate the speaker token with the text
-    dplyr::mutate(text = paste(speaker, text)) %>%
+    dplyr::mutate(text = paste(speaker, text, sep = " ")) %>%
 
     # 3. Select only the final combined text column
     dplyr::select(text)
