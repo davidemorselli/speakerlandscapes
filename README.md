@@ -1,6 +1,7 @@
 # Speaker Landscape Analysis: Vector Space Mapping and Visualization
 
-This R packge ouline the pipeline for analyzing speaker similarities based on their language, as outlined in *Schuld, M., Durrheim, K., & Mafunda, M. (2024). Speaker landscapes: Machine learning opens a window on the everyday language of opinion. Communication Methods and Measures, 18(4), 315-331.*.
+This R packge ouline the pipeline for analyzing speaker similarities based on their language, as outlined in *Schuld, M., Durrheim, K., & Mafunda, M. (2024). Speaker landscapes: Machine learning opens a window on the everyday language of opinion. Communication Methods and Measures, 18(4), 315-331.*
+
 The procedure transforms raw text into a high-dimensional vector space using Word2Vec and subsequently reduces the data to a 2D "landscape" using UMAP for visual interpretation.
 
 ## 1. Methodology Overview
