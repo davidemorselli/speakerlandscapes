@@ -43,7 +43,6 @@
 #' )
 #' plot_speaker_landscapes(landscape_data, categories = speaker_categories)
 #' }
-#'
 #' @export
 plot_speaker_landscapes <- function(speaker_landscape,
                                     size_points = .3,

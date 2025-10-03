@@ -64,7 +64,6 @@
 #' # Expected output column 'text' will contain "natural_language" and/or "language_processing"
 #' print(result$text)
 #' }
-#'
 #' @export
 create_bigrams <- function(data, text_col, n_bigrams = 10, stopwords_language="en",custom_stopwords=NULL) {
 

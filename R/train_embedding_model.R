@@ -56,7 +56,6 @@
 #' # You can then access the embeddings:
 #' # embedding_matrix <- as.matrix(trained_model)
 #' }
-#'
 #' @export
 train_embedding_model <- function(
     file_path,
