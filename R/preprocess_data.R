@@ -45,10 +45,7 @@
 #' # Subsample 10% of the data
 #' preprocessed_sample <- preprocess_data("path/to/text_data.txt", share_data = 0.1)
 #' }
-<<<<<<< HEAD
 #' @export
-=======
->>>>>>> ffdbbfbf087ca41a4c389908e4d45b4b513cdc19
 preprocess_data <- function(data, share_data = 1.0, stopwords_language = "en", custom_stopwords=NULL) {
 
   # Read the entire file into a tibble
