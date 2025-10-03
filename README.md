@@ -22,7 +22,7 @@ The initial text file (or character vector) is assumed to contain a speaker ID f
 
 2. **Speaker Token Creation:** A dedicated speaker token is created (e.g., `speaker_userA`) for each unique speaker ID.
 
-3. **Corpus Preparation:** The speaker token is prepended to every line of text, creating an input format like: `speaker_userA the quick brown fox`. This ensures that when the Word2Vec model is trained, it treats `speaker_userA` as a valid token and learns a vector embedding for it based on the words that follow it.
+3. **Corpus Preparation:** The speaker token is prepended to every line of text, creating an input format like: `speaker_userA the quick brown fox`. This ensures that when the Word2Vec model is trained, it treats the`speaker_userA` as a valid token and learns a vector embedding for it based on the words that follow it. A speaker vector is thus created based on the language used by the speaker, and speakers are positioned in a vectorial space accroding to the semantic the refer to. 
 
 ### Advanced Tokenization (N-gram Substitution)
 
