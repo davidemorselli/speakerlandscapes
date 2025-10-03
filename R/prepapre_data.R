@@ -52,7 +52,7 @@ prepare_data <- function(data,
 
   # Use the column names dynamically and ensure they are selected first
   data_processed <- data %>%
-    dplyr::elect(text = {{text_column}}, author = {{speaker_id_column}}) %>%
+    dplyr::select(text = {{text_column}}, author = {{speaker_id_column}}) %>%
 
     # 1. Create the unique speaker token (e.g., "speaker_authorID")
     dplyr::mutate(speaker = paste(speaker_identifier, author, sep = "_")) %>%
