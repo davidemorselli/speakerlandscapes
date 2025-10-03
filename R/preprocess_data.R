@@ -45,6 +45,7 @@
 #' # Subsample 10% of the data
 #' preprocessed_sample <- preprocess_data("path/to/text_data.txt", share_data = 0.1)
 #' }
+#'
 #' @export
 preprocess_data <- function(data, share_data = 1.0, stopwords_language = "en", custom_stopwords=NULL) {
 

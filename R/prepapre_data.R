@@ -44,6 +44,7 @@
 #' )
 #' print(processed_text)
 #' }
+#'
 #' @export
 prepare_data <- function(data,
                          text_column = "text",

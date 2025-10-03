@@ -35,6 +35,7 @@
 #' # new       2
 #' # york      2
 #' }
+#'
 #' @export
 get_most_frequent_tokens <- function(token_list, n_top = 100, min_count = 100, stopword_language = "en",
                                      custom_stopwords = NULL) {
