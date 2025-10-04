@@ -71,3 +71,15 @@ The final plot is generated to display the resulting **speaker landscape** in an
 * **Thematic Labeling:** The selected `tokens_to_plot` (key words) are plotted as text labels on the same canvas. The position of these word labels indicates the thematic focus associated with nearby speaker clusters.
 
 * **Categorical Grouping (Optional):** If a separate `categories` data frame is provided, speakers are colored by their defined category, aiding in the interpretation of how pre-defined groups map onto the learned linguistic space.
+
+## 6. Detailed Example and Walkthrough
+
+To see a complete, runnable demonstration of the full speaker landscape pipeline, including data preparation, Word2Vec training, UMAP reduction, and visualization, please view our detailed walkthrough notebook.
+
+
+| Notebook View (Rendered HTML) | Source Code (`.Rmd`) |
+| :---------------------------- | :------------------- |
+| **[View Full Walkthrough]** | **[View Source Code]** |
+
+[View Full Walkthrough]: [https://htmlpreview.github.io/?https://github.com/davidemorselli/speakerlandscapes/vignette_example.html](https://htmlpreview.github.io/?https://github.com/davidemorselli/speakerlandscapes/vignette_example.html)
+[View Source Code]: [https://github.com/davidemorselli/speakerlandscapes/vignette_example.Rmd](https://github.com/davidemorselli/speakerlandscapes/vignette_example.Rmd)
