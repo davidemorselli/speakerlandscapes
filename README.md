@@ -81,5 +81,5 @@ To see a complete, runnable demonstration of the full speaker landscape pipeline
 | :---------------------------- | :------------------- |
 | **[View Full Walkthrough]** | **[View Source Code]** |
 
-[View Full Walkthrough]: https://htmlpreview.github.io/?https://github.com/davidemorselli/speakerlandscapes/blob/main/vignette_example.html
+[View Full Walkthrough]: https://htmlpreview.github.io/?https://github.com/davidemorselli/speakerlandscapes/blob/main/vignette_example.nb.html
 [View Source Code]: https://github.com/davidemorselli/speakerlandscapes/blob/main/vignette_example.Rmd
