@@ -1,0 +1,68 @@
+---
+title: "Working pipeline"
+output: html_notebook
+---
+## 1) Import data. 
+
+Source data should have column with speaker identifiers (e.g., usernames) and one withe text (e.g., social media posts)
+
+```{r}
+library(speakerlandscapes)
+
+data = read.csv("raw_corpus.csv")
+head(data)
+
+```
+## 2) Make data ready to build landscapes.
+
+This create a \code{speakers_text} object: a character vector in which the first token is the speaker name, prefixed by an identifying token (e.g. "agent"). Bigrams and trigrams are found in the text and replaced by single tokens (e.g., word1_word2)
+
+```{r}
+
+ready_data = prepare_data(data, 
+                          speaker_id_column = "speaker", 
+                          text_column = "text", 
+                          speaker_identifier = "agent")
+
+head(ready_data)
+
+```
+
+## 3) Make the embedding
+
+Compute the embeddings from the \code{speakers_text} object.
+
+```{r}
+embedding = train_embedding_model(ready_data, 
+                                  min_count = 1) #Beware, min_count=1 is only for the example. A number close to the retain_threshold of themake_speaker_landscapes() should be used
+
+
+```
+
+# 4) Make the speaker landscape.
+
+This step use UMAP to reduce the 250-dimension embedding to a more interpretable 2-dimension and extract speakers vectors. Other tokens present in the embedding can be also specified here to be plotted in the next step. In this exemple we use the \code{get_most_frequent_tokens()} function to extract the words that appear at least 10 times in the text. 
+
+```{r}
+frequent_words = get_most_frequent_tokens(ready_data, min_count = 10)
+
+landscape = make_speaker_landscapes(data = ready_data ,
+                                    embedding = embedding, 
+                                    tokens_to_plot = frequent_words,
+                                    speaker_identifier = "agent",
+                                    retain_threshold = 1,
+                                    n_neighbors =5,
+                                    min_dist = 0.01) #Beware, n_neighbors=10 is only for the example. A larger number should be preferred
+
+
+```
+
+## 5) Plot the speaker landscape.
+
+Plot the speaker landscape along with word tokens specified in the previous step.
+
+```{r}
+plot_speaker_landscapes(landscape, alpha_points = 1)
+
+```
+
