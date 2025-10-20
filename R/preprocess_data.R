@@ -18,6 +18,7 @@
 #'   tokenized line (i.e., a list of words). If \code{share_data < 1.0},
 #'   this list will be a random subsample of the lines.
 #'
+#'
 #' @details
 #' The function relies heavily on Tidyverse packages and requires an external function
 #' named \code{create_bigrams} to be defined in the search path.
