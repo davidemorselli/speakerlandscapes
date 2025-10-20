@@ -7,6 +7,7 @@ output: html_notebook
 Source data should have column with speaker identifiers (e.g., usernames) and one withe text (e.g., social media posts)
 
 ```{r}
+library(tidyverse)
 library(speakerlandscapes)
 
 data = read.csv("raw_corpus.csv")
