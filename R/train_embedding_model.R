@@ -63,7 +63,7 @@ train_embedding_model <- function(
     dim = 250,
     window = 10,
     min_count = 5,
-    iter = 15,
+    iter = 20,
     threads = 7,
     seed = 123
 ) {
