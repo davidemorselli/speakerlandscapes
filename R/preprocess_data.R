@@ -13,6 +13,7 @@
 #'   Defaults to \code{"en"} (English). Use \code{NULL} to skip loading default stop words.
 #' @param custom_stopwords A character vector of additional stop words to
 #'   exclude from bigram formation. Defaults to \code{NULL}.
+#' @param min_freq Minimum frequencies to replace pair of words with the respective bigrams. Defaults is \code{10}.
 #' @return A list where each element is a character vector representing a
 #'   tokenized line (i.e., a list of words). If \code{share_data < 1.0},
 #'   this list will be a random subsample of the lines.
@@ -46,7 +47,7 @@
 #' preprocessed_sample <- preprocess_data("path/to/text_data.txt", share_data = 0.1)
 #' }
 #' @export
-preprocess_data <- function(data, share_data = 1.0, stopwords_language = "en", custom_stopwords=NULL) {
+preprocess_data <- function(data, share_data = 1.0, stopwords_language = "en", custom_stopwords=NULL, min_freq=10) {
 
   # Read the entire file into a tibble
   if(class(data) == "speakers_text"){
@@ -59,11 +60,11 @@ preprocess_data <- function(data, share_data = 1.0, stopwords_language = "en", c
 
   # find and replace bigrams
   print("Making bigrams.....please wait.....")
-  corpus = create_bigrams(corpus, text, n_bigrams = 10, stopwords_language = stopwords_language, custom_stopwords = custom_stopwords)
+  corpus = create_bigrams(corpus, text, n_bigrams = min_freq, stopwords_language = stopwords_language, custom_stopwords = custom_stopwords)
 
   # find and replace trigrams (by running create_bigrams again on the already processed text)
   print("Making trigrams.....please wait.....")
-  corpus = create_bigrams(corpus, text, n_bigrams = 10, stopwords_language = stopwords_language, custom_stopwords = custom_stopwords)
+  corpus = create_bigrams(corpus, text, n_bigrams = min_freq, stopwords_language = stopwords_language, custom_stopwords = custom_stopwords)
 
   print("Preparing data for embedding.....")
   data_tbl = corpus$text %>%

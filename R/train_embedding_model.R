@@ -88,7 +88,8 @@ train_embedding_model <- function(
     window = window,
     min_count = min_count,
     iter = iter,        # epochs
-    threads = threads   # CPU cores for parallel computing
+    threads = threads,   # CPU cores for parallel computing
+    verbose = T
   )
 
   # Save the model
