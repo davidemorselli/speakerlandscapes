@@ -1,6 +1,8 @@
 ---
 title: "Working pipeline"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 ## 1) Import data. 
 
@@ -10,7 +12,7 @@ Source data should have column with speaker identifiers (e.g., usernames) and on
 library(tidyverse)
 library(speakerlandscapes)
 
-data = read.csv("raw_corpus.csv")
+data = read_csv("raw_corpus.csv")
 head(data)
 
 ```
@@ -35,7 +37,7 @@ Compute the embeddings from the \code{speakers_text} object.
 
 ```{r}
 embedding = train_embedding_model(ready_data, 
-                                  min_count = 1) #Beware, min_count=1 is only for the example. A number close to the retain_threshold of themake_speaker_landscapes() should be used
+                                  min_count = 1) #Beware, min_count=1 is only for the example. It indicate minimum frequency required for a token to be included in the vocabulary. A higher number is preferable
 
 
 ```
@@ -52,8 +54,8 @@ landscape = make_speaker_landscapes(data = ready_data ,
                                     tokens_to_plot = frequent_words,
                                     speaker_identifier = "agent",
                                     retain_threshold = 1,
-                                    n_neighbors =5,
-                                    min_dist = 0.01) #Beware, n_neighbors=10 is only for the example. A larger number should be preferred
+                                    n_neighbors = 30,
+                                    min_dist = 0.01) 
 
 
 ```
@@ -63,7 +65,7 @@ landscape = make_speaker_landscapes(data = ready_data ,
 Plot the speaker landscape along with word tokens specified in the previous step.
 
 ```{r}
-plot_speaker_landscapes(landscape, alpha_points = 1)
+plot_speaker_landscapes(landscape, alpha_points = .6, size_points = 1)
 
 ```
 

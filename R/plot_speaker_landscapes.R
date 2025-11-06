@@ -8,9 +8,9 @@
 #'   function, containing the UMAP-reduced coordinates for both speakers (\code{$speakers})
 #'   and words (\code{$words}).
 #' @param size_points A numeric value specifying the size of the speaker points in the plot.
-#'   Defaults to \code{.3}.
+#'   Defaults to \code{1}.
 #' @param alpha_points A numeric value specifying the transparency (alpha) of the
-#'   speaker points in the plot. Defaults to \code{.3}.
+#'   speaker points in the plot. Defaults to \code{.6}.
 #' @param categories Optional: A data frame or tibble with columns named \code{author}
 #'   (containing speaker identifiers) and \code{categories} (containing the classification
 #'   of the speakers). If provided, speakers will be colored by this column.
@@ -45,8 +45,8 @@
 #' }
 #' @export
 plot_speaker_landscapes <- function(speaker_landscape,
-                                    size_points = .3,
-                                    alpha_points = .3,
+                                    size_points = 1,
+                                    alpha_points = .6,
                                     categories = NULL) {
 
   # Extract data from the list returned by make_speaker_landscapes
