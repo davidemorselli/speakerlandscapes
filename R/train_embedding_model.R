@@ -21,6 +21,11 @@
 #'   parallel computing during training. Defaults to \code{7}.
 #' @param seed An integer used to set the random seed for reproducibility.
 #'   Defaults to \code{123}.
+#' @param stopwords_language A character string specifying the language for
+#'   the default stop words, as supported by the \code{stopwords} package.
+#'   Defaults to \code{"en"} (English). Use \code{NULL} to skip loading default stop words.
+#' @param custom_stopwords A character vector of additional stop words to
+#'   exclude from bigram formation. Defaults to \code{NULL}.
 #'
 #' @return The trained \code{word2vec} model object (an S3 object of class \code{word2vec}).
 #'   The model is also saved to disk at the path specified by \code{output_file}.
@@ -65,14 +70,15 @@ train_embedding_model <- function(
     min_count = 5,
     iter = 20,
     threads = 7,
-    seed = 123
+    seed = 123,
+    stopwords_language = "en",
+    custom_stopwords = NULL,
+    ...
 ) {
 
   message("Starting preprocessing data")
   # Preprocessing function
-  # Note: The parameters for preprocess_data are hardcoded here for simplicity,
-  # but should ideally be passed into train_embedding_model if they need to be configurable.
-  training_data <- preprocess_data(file_path, share_data = 1.0, stopwords_language = "en", custom_stopwords = NULL)
+  training_data <- preprocess_data(file_path, share_data = 1.0, stopwords_language = stopwords_language, custom_stopwords = custom_stopwords)
 
   # --- Model Training ---
   # Set seeds for reproducibility
