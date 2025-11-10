@@ -35,11 +35,16 @@ quotes a speaker must have to be included in the final plot. Defaults to \code{1
 \item{umap_seed}{An integer seed for the random number generator used by UMAP
 to ensure reproducibility. Defaults to \code{42}.}
 
-\item{n_neighbors}{An integer specifying the number of nearest neighbors for
-the UMAP algorithm. Defaults to \code{40}.}
+\item{n_neighbors}{UMAP hyperparameter. An integer specifying the number of nearest neighbors for
+the UMAP algorithm. Defaults to \code{10}. This parameter controls how UMAP balances local versus global structure in the data.
+It does this by constraining the size of the local neighborhood UMAP will look at when attempting to learn the manifold structure of the data.
+Low values of n_neighbors will force UMAP to concentrate on very local structure, potentially to the detriment of the big picture
+, while large values may lose fine detail structure. For more information see \ref{https://umap-learn.readthedocs.io/en/latest/parameters.html}.}
 
-\item{min_dist}{A numeric value specifying the minimum distance parameter for
-the UMAP algorithm. Defaults to \code{0.01}.}
+\item{min_dist}{UMAP hyperparameter. A numeric value specifying the minimum distance parameter for
+the UMAP algorithm. Defaults to \code{0.01}. It provides the minimum distance that points are allowed to be in the low dimensional representation.
+Low values of min_dist will result in clumpier embeddings. This can be useful if you are interested in clustering, or in finer topological structure.
+Larger values of min_dist will prevent UMAP from packing points together and will focus on the preservation of the broad topological structure instead. For more information see \ref{https://umap-learn.readthedocs.io/en/latest/parameters.html}.}
 }
 \value{
 A \code{list} containing two tibbles:

@@ -6,8 +6,8 @@
 \usage{
 plot_speaker_landscapes(
   speaker_landscape,
-  size_points = 0.3,
-  alpha_points = 0.3,
+  size_points = 1,
+  alpha_points = 0.6,
   categories = NULL
 )
 }
@@ -17,10 +17,10 @@ function, containing the UMAP-reduced coordinates for both speakers (\code{$spea
 and words (\code{$words}).}
 
 \item{size_points}{A numeric value specifying the size of the speaker points in the plot.
-Defaults to \code{.3}.}
+Defaults to \code{1}.}
 
 \item{alpha_points}{A numeric value specifying the transparency (alpha) of the
-speaker points in the plot. Defaults to \code{.3}.}
+speaker points in the plot. Defaults to \code{.6}.}
 
 \item{categories}{Optional: A data frame or tibble with columns named \code{author}
 (containing speaker identifiers) and \code{categories} (containing the classification

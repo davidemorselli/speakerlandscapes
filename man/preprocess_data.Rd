@@ -8,7 +8,8 @@ preprocess_data(
   data,
   share_data = 1,
   stopwords_language = "en",
-  custom_stopwords = NULL
+  custom_stopwords = NULL,
+  min_freq = 10
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ Defaults to \code{"en"} (English). Use \code{NULL} to skip loading default stop 
 
 \item{custom_stopwords}{A character vector of additional stop words to
 exclude from bigram formation. Defaults to \code{NULL}.}
+
+\item{min_freq}{Minimum frequencies to replace pair of words with the respective bigrams. Defaults is \code{10}.}
 }
 \value{
 A list where each element is a character vector representing a

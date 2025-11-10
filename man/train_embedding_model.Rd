@@ -10,9 +10,12 @@ train_embedding_model(
   dim = 250,
   window = 10,
   min_count = 5,
-  iter = 15,
+  iter = 20,
   threads = 7,
-  seed = 123
+  seed = 123,
+  stopwords_language = "en",
+  custom_stopwords = NULL,
+  ...
 )
 }
 \arguments{
@@ -39,6 +42,13 @@ parallel computing during training. Defaults to \code{7}.}
 
 \item{seed}{An integer used to set the random seed for reproducibility.
 Defaults to \code{123}.}
+
+\item{stopwords_language}{A character string specifying the language for
+the default stop words, as supported by the \code{stopwords} package.
+Defaults to \code{"en"} (English). Use \code{NULL} to skip loading default stop words.}
+
+\item{custom_stopwords}{A character vector of additional stop words to
+exclude from bigram formation. Defaults to \code{NULL}.}
 }
 \value{
 The trained \code{word2vec} model object (an S3 object of class \code{word2vec}).
