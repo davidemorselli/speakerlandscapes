@@ -194,11 +194,11 @@ make_speaker_landscapes <- function(
 
   # Separate reduced dimensions for speakers and words
   low_dim_speakers <- low_dim_vecs %>%
-    filter(token %in% df_filtered$author) %>%
+    filter(tolower(token) %in% tolower(df_filtered$author)) %>%
     rename(author = token)
 
   low_dim_words <- low_dim_vecs %>%
-    filter(token %in% tokens_to_plot$token) %>%
+    filter(tolower(token) %in% tolower(tokens_to_plot$token)) %>%
     rename(words = token)
 
   # Final speaker Data (for plotting points)
