@@ -47,7 +47,7 @@ embedding = train_embedding_model(ready_data,
 This step use UMAP to reduce the 250-dimension embedding to a more interpretable 2-dimension and extract speakers vectors. Other tokens present in the embedding can be also specified here to be plotted in the next step. In this exemple we use the \code{get_most_frequent_tokens()} function to extract the words that appear at least 10 times in the text. 
 
 ```{r}
-frequent_words = get_most_frequent_tokens(ready_data, min_count = 10)
+frequent_words = get_most_frequent_tokens(ready_data, min_count = 10, stopword_language = "en")
 
 landscape = make_speaker_landscapes(data = ready_data ,
                                     embedding = embedding, 
