@@ -182,6 +182,8 @@ make_speaker_landscapes <- function(
   message("Starting UMAP dimensionality reduction. This might also take a while....")
   reducer <- umap(
     d = filtered_vecs,
+    #d = filtered_vecs,
+    d = all_vecs,
     metric = "cosine",
     n_neighbors = n_neighbors,
     min_dist = min_dist
