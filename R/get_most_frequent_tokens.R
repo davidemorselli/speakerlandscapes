@@ -9,6 +9,7 @@
 #' @param min_count The minimum number of times a token must appear. Defaults to 100.
 #' @param stopword_language The language for the stopwords. Defaults to "en".
 #' @param custom_stopwords A character vector of additional stop words to remove.
+#' @param min_freq Minimum frequencies to replace pair of words with the respective bigrams. Defaults is \code{10}.
 #'
 #' @return A tibble with columns 'token' and 'n' (count), sorted by frequency.
 #'
@@ -37,11 +38,11 @@
 #' }
 #' @export
 get_most_frequent_tokens <- function(data, n_top = 100, min_count = 100, stopword_language = "en",
-                                     custom_stopwords = NULL) {
+                                     custom_stopwords = NULL, min_freq=10) {
 
   # 1. Convert the list of vectors into a quanteda tokens object
   # quanteda::tokens() is designed to handle lists of character vectors efficiently.
-  token_list <- preprocess_data(data)
+  token_list <- preprocess_data(data, stopword_language = stopword_language, custom_stopwords = custom_stopwords, min_freq = min_freq)
 
   # Check if the list is empty
   if (length(token_list) == 0 || all(sapply(token_list, length) == 0)) {
