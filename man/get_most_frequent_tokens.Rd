@@ -9,7 +9,8 @@ get_most_frequent_tokens(
   n_top = 100,
   min_count = 100,
   stopword_language = "en",
-  custom_stopwords = NULL
+  custom_stopwords = NULL,
+  min_freq = 10
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ get_most_frequent_tokens(
 \item{stopword_language}{The language for the stopwords. Defaults to "en".}
 
 \item{custom_stopwords}{A character vector of additional stop words to remove.}
+
+\item{min_freq}{Minimum frequencies to replace pair of words with the respective bigrams. Defaults is \code{10}.}
 
 \item{token_list}{A list of character vectors (tokenized documents).}
 }
