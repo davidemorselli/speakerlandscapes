@@ -9,7 +9,8 @@ preprocess_data(
   share_data = 1,
   stopwords_language = "en",
   custom_stopwords = NULL,
-  min_freq = 10
+  min_freq = 10,
+  ...
 )
 }
 \arguments{

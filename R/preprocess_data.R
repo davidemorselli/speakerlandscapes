@@ -48,7 +48,7 @@
 #' preprocessed_sample <- preprocess_data("path/to/text_data.txt", share_data = 0.1)
 #' }
 #' @export
-preprocess_data <- function(data, share_data = 1.0, stopwords_language = "en", custom_stopwords=NULL, min_freq=10) {
+preprocess_data <- function(data, share_data = 1.0, stopwords_language = "en", custom_stopwords=NULL, min_freq=10, ...) {
 
   # Read the entire file into a tibble
   if(class(data) == "speakers_text"){

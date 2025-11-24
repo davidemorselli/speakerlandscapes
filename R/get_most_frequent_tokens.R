@@ -37,12 +37,12 @@
 #' # york      2
 #' }
 #' @export
-get_most_frequent_tokens <- function(data, n_top = 100, min_count = 100, stopword_language = "en",
+get_most_frequent_tokens <- function(data, n_top = 100, min_count = 100, stopwords_language = "en",
                                      custom_stopwords = NULL, min_freq=10) {
 
   # 1. Convert the list of vectors into a quanteda tokens object
   # quanteda::tokens() is designed to handle lists of character vectors efficiently.
-  token_list <- speakerlandscapes::preprocess_data(data, stopword_language = stopword_language, custom_stopwords = custom_stopwords, min_freq = min_freq)
+  token_list <- preprocess_data(data, stopwords_language = stopwords_language, custom_stopwords = custom_stopwords, min_freq = min_freq)
 
   # Check if the list is empty
   if (length(token_list) == 0 || all(sapply(token_list, length) == 0)) {
@@ -55,7 +55,7 @@ get_most_frequent_tokens <- function(data, n_top = 100, min_count = 100, stopwor
 
   # 2. Remove Stopwords
   # Combine default and custom stopwords
-  all_stopwords <- c(stopwords::stopwords(stopword_language), custom_stopwords)
+  all_stopwords <- c(stopwords::stopwords(stopwords_language), custom_stopwords)
 
   # Use quanteda::tokens_remove for efficient stopword filtering
   toks_clean <- quanteda::tokens_remove(
