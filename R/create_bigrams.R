@@ -112,7 +112,7 @@ create_bigrams <- function(data, text_col, n_bigrams = 10, stopwords_language="e
 
   # Check if any bigrams were found
   if (nrow(bigram_counts) == 0) {
-    warning("No valid bigrams found to combine. Returning original data.")
+    # warning("No valid bigrams found to combine. Returning original data.")
     # Return original data with an alternative column name to avoid accidental overwrites
     return(data %>% dplyr::mutate(text_combined = {{ text_col }}))
   }
