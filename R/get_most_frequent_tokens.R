@@ -42,7 +42,7 @@ get_most_frequent_tokens <- function(data, n_top = 100, min_count = 100, stopwor
 
   # 1. Convert the list of vectors into a quanteda tokens object
   # quanteda::tokens() is designed to handle lists of character vectors efficiently.
-  token_list <- preprocess_data(data, stopword_language = stopword_language, custom_stopwords = custom_stopwords, min_freq = min_freq)
+  token_list <- speakerlandscapes::preprocess_data(data, stopword_language = stopword_language, custom_stopwords = custom_stopwords, min_freq = min_freq)
 
   # Check if the list is empty
   if (length(token_list) == 0 || all(sapply(token_list, length) == 0)) {
