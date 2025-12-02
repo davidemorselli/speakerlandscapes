@@ -11,9 +11,6 @@
 #'
 #' @param embedding A pre-trained vector embeddings object (e.g., a matrix of
 #'   word2vec embeddings) where \code{rownames} contain the tokens/speakers being mapped.
-#' @param tokens_to_plot A data frame or tibble with a column named \code{token}
-#'   containing a character vector of tokens (e.g., important words) whose
-#'   embeddings should also be reduced and plotted as labels.
 #' @param speaker_identifier A character string prefix used to identify the
 #'   speaker tokens. This is used in the internal filtering step and it is transposed to low case. Defaults to \code{"speaker"}.
 #' @param retain_threshold An integer threshold for the minimum number of
@@ -93,7 +90,6 @@
 make_speaker_landscapes <- function(
     data,
     embedding = NULL,
-    tokens_to_plot = NULL,
     speaker_identifier = "speaker",
     retain_threshold = 1,
     umap_seed = 42,
@@ -171,11 +167,8 @@ make_speaker_landscapes <- function(
     filter(grepl(speaker_identifier, author) | TRUE) %>%
     select(author)
 
-  # Combine author names and word tokens for a single UMAP run
-  all_tokens_to_map <- unique(c(filtered_authors$author, tokens_to_plot$token))
-
-  # Filter the embedding matrix
-  filtered_vecs = all_vecs[rownames(all_vecs) %in% all_tokens_to_map, ]
+  # # Filter the embedding matrix
+  # filtered_vecs = all_vecs[rownames(all_vecs) %in% all_tokens_to_map, ]
 
   # --- Apply UMAP for dimensionality reduction ---
   set.seed(umap_seed)
@@ -194,13 +187,13 @@ make_speaker_landscapes <- function(
 
   # Separate reduced dimensions for speakers and words
   low_dim_speakers <- low_dim_vecs %>%
-    filter(tolower(token) %in% tolower(df_filtered$author)) %>%
+    #filter(tolower(token) %in% tolower(df_filtered$author)) %>%
     rename(author = token) %>%
     mutate(author = tolower(author))
 
-  low_dim_words <- low_dim_vecs %>%
-    filter(tolower(token) %in% tolower(tokens_to_plot$token)) %>%
-    rename(words = token)
+  # low_dim_words <- low_dim_vecs %>%
+  #   filter(tolower(token) %in% tolower(tokens_to_plot$token)) %>%
+  #   rename(words = token)
 
   # Final speaker Data (for plotting points)
   df_final <- df_filtered %>%
@@ -209,5 +202,5 @@ make_speaker_landscapes <- function(
     filter(!is.na(X1))
 
   # Return a list of both speaker and word UMAP data
-  return(list(speakers = df_final, words = low_dim_words))
+  return(list(speakers = df_final, all_tokens = low_dim_vecs))
 }

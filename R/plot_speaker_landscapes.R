@@ -7,6 +7,9 @@
 #' @param speaker_landscape A \code{list} object returned by the \code{make_speaker_landscapes}
 #'   function, containing the UMAP-reduced coordinates for both speakers (\code{$speakers})
 #'   and words (\code{$words}).
+#' @param tokens_to_plot A data frame or tibble with a column named \code{token}
+#'   containing a character vector of tokens (e.g., important words) whose
+#'   embeddings should also be reduced and plotted as labels.
 #' @param size_points A numeric value specifying the size of the speaker points in the plot.
 #'   Defaults to \code{1}.
 #' @param alpha_points A numeric value specifying the transparency (alpha) of the
@@ -45,19 +48,22 @@
 #' }
 #' @export
 plot_speaker_landscapes <- function(speaker_landscape,
+                                    tokens_to_plot = NULL,
                                     size_points = 1,
                                     alpha_points = .6,
                                     categories = NULL) {
 
   # Extract data from the list returned by make_speaker_landscapes
   df_final <- speaker_landscape$speakers
-  low_dim_words <- speaker_landscape$words
+  low_dim_words <- speaker_landscape$all_tokens %>%
+    filter(tolower(token) %in% tolower(tokens_to_plot$token)) %>%
+    rename(words = token)
 
   # Handle optional categories join
   if (!is.null(categories)) {
     # Assuming 'categories' has columns 'author' and 'categories'
     df_final <- df_final %>%
-      dplyr::left_join(categories, by = "author")
+      dplyr::left_join(categories %>% mutate(author = tolower(author)), by = "author")
   } else {
     # Create a dummy variable for color if no categories provided
     df_final <- df_final %>% dplyr::mutate(categories = "Uncategorized")
