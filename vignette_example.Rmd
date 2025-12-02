@@ -13,7 +13,7 @@ library(tidyverse)
 devtools::install_github("davidemorselli/speakerlandscapes")
 library(speakerlandscapes)
 
-data = read_csv("raw_corpus.csv")
+data = read_csv2("raw_corpus.csv")
 head(data)
 
 ```
@@ -49,11 +49,8 @@ embedding = train_embedding_model(ready_data,
 This step use UMAP to reduce the 250-dimension embedding to a more interpretable 2-dimension and extract speakers vectors. Other tokens present in the embedding can be also specified here to be plotted in the next step. In this exemple we use the \code{get_most_frequent_tokens()} function to extract the words that appear at least 10 times in the text. 
 
 ```{r}
-frequent_words = get_most_frequent_tokens(ready_data, min_count = 10, stopwords_language = "en")
-
 landscape = make_speaker_landscapes(data = ready_data ,
                                     embedding = embedding, 
-                                    tokens_to_plot = frequent_words,
                                     speaker_identifier = "agent",
                                     retain_threshold = 1,
                                     n_neighbors = 30,
@@ -67,7 +64,18 @@ landscape = make_speaker_landscapes(data = ready_data ,
 Plot the speaker landscape along with word tokens specified in the previous step.
 
 ```{r}
-plot_speaker_landscapes(landscape, alpha_points = .6, size_points = 1)
+frequent_words = get_most_frequent_tokens(ready_data, min_count = 10, stopwords_language = "en")
+
+categories = data %>% 
+  select(speaker, opinion) %>% 
+  rename(author = speaker,
+         categories = opinion) %>% 
+  mutate(author = paste0("agent_",author))
+
+plot_speaker_landscapes(landscape,
+                        tokens_to_plot = frequent_words,
+                        alpha_points = .6, size_points = 1,
+                        categories = categories)
 
 ```
 
