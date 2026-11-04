@@ -6,7 +6,7 @@
 \usage{
 extract_speaker_clusters(
   speaker_landscape,
-  minPts = 5,
+  minPts = 10,
   cluster_on = c("umap", "embedding"),
   embedding = NULL,
   radius_quantile = 0.95,

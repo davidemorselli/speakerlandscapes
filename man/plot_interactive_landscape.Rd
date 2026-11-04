@@ -18,7 +18,7 @@ plot_interactive_landscape(
   legend_title = NULL,
   show_clusters = "auto",
   cluster_minPts = 5,
-  cluster_alpha = 0.12,
+  cluster_alpha = 0,
   cluster_color = NULL,
   noise_color = "#9ca3af",
   label_clusters = FALSE,
@@ -78,8 +78,8 @@ locations of its member speakers on the 2D plot. If \code{TRUE} and clusters hav
 \item{cluster_minPts}{Integer specifying \code{minPts} if \code{\link{extract_speaker_clusters}} is called
 automatically when \code{show_clusters = TRUE} or \code{color_by = "cluster"}. Defaults to \code{5}.}
 
-\item{cluster_alpha}{Numeric value in \code{[0, 1]} specifying the fill opacity of the cluster circles.
-Defaults to \code{0.12}.}
+\item{cluster_alpha}{Numeric value in \code{[0, 1]} specifying the fill opacity of the cluster circles/ellipses.
+Defaults to \code{0} (unfilled outline circles).}
 
 \item{cluster_color}{Optional color (or vector of colors) for the cluster circles. If \code{NULL} (default),
 clusters are colored distinctly using a consistent palette matching speaker points, while noise points are colored gray.}

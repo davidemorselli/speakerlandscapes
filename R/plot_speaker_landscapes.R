@@ -43,8 +43,8 @@
 #'   \code{\link{extract_speaker_clusters}} is called automatically with \code{minPts = cluster_minPts}.
 #' @param cluster_minPts Integer specifying \code{minPts} if \code{\link{extract_speaker_clusters}} is called
 #'   automatically when \code{show_clusters = TRUE} or \code{color_by = "cluster"}. Defaults to \code{5}.
-#' @param cluster_alpha Numeric value in \code{[0, 1]} specifying the fill opacity of the cluster circles.
-#'   Defaults to \code{0.12}.
+#' @param cluster_alpha Numeric value in \code{[0, 1]} specifying the fill opacity of the cluster circles/ellipses.
+#'   Defaults to \code{0} (unfilled outline circles).
 #' @param cluster_color Optional color (or vector of colors) for the cluster circles. If \code{NULL} (default),
 #'   clusters are colored distinctly using a consistent palette, while noise points are colored gray.
 #' @param noise_color Color string used for speakers assigned to the noise category (\code{"Noise"}).
@@ -57,7 +57,7 @@
 #'
 #' @return A \code{ggplot} object (if \code{interactive = FALSE}) or an interactive HTML widget (if \code{interactive = TRUE}).
 #'
-#' @importFrom ggplot2 ggplot aes geom_point geom_text geom_polygon coord_fixed theme_minimal theme element_blank scale_color_viridis_c scale_color_gradientn scale_color_distiller scale_color_manual scale_fill_manual labs guides guide_legend
+#' @importFrom ggplot2 ggplot aes geom_point geom_text geom_polygon geom_path coord_fixed theme_minimal theme element_blank scale_color_viridis_c scale_color_gradientn scale_color_distiller scale_color_manual scale_fill_manual labs guides guide_legend
 #' @importFrom dplyr %>% mutate left_join filter rename bind_rows
 #' @importFrom tibble tibble
 #'
@@ -97,7 +97,7 @@ plot_speaker_landscapes <- function(speaker_landscape,
                                     legend_title = NULL,
                                     show_clusters = "auto",
                                     cluster_minPts = 5,
-                                    cluster_alpha = 0.12,
+                                    cluster_alpha = 0,
                                     cluster_color = NULL,
                                     noise_color = "#9ca3af",
                                     label_clusters = FALSE,
@@ -285,40 +285,71 @@ plot_speaker_landscapes <- function(speaker_landscape,
     circle_polys <- build_cluster_circle_polygons(clusters_df)
     circle_polys$cluster_label <- factor(circle_polys$cluster_label, levels = names(cluster_color_map))
 
-    if (!is.null(cluster_color) && length(cluster_color) == 1) {
-      plot_obj <- plot_obj +
-        ggplot2::geom_polygon(
-          data = circle_polys,
-          mapping = ggplot2::aes(x = x, y = y, group = cluster_label),
-          inherit.aes = FALSE,
-          fill = cluster_color,
-          color = cluster_color,
-          alpha = cluster_alpha,
-          linewidth = 0.6
-        )
-    } else if (color_by %in% c("cluster", "none")) {
-      plot_obj <- plot_obj +
-        ggplot2::geom_polygon(
-          data = circle_polys,
-          mapping = ggplot2::aes(x = x, y = y, group = cluster_label, fill = cluster_label, color = cluster_label),
-          inherit.aes = FALSE,
-          alpha = cluster_alpha,
-          linewidth = 0.6,
-          show.legend = (color_by == "none")
-        )
+    if (cluster_alpha > 0) {
+      if (!is.null(cluster_color) && length(cluster_color) == 1) {
+        plot_obj <- plot_obj +
+          ggplot2::geom_polygon(
+            data = circle_polys,
+            mapping = ggplot2::aes(x = x, y = y, group = cluster_label),
+            inherit.aes = FALSE,
+            fill = cluster_color,
+            color = cluster_color,
+            alpha = cluster_alpha,
+            linewidth = 0.6
+          )
+      } else if (color_by %in% c("cluster", "none")) {
+        plot_obj <- plot_obj +
+          ggplot2::geom_polygon(
+            data = circle_polys,
+            mapping = ggplot2::aes(x = x, y = y, group = cluster_label, fill = cluster_label, color = cluster_label),
+            inherit.aes = FALSE,
+            alpha = cluster_alpha,
+            linewidth = 0.6,
+            show.legend = (color_by == "none")
+          )
+      } else {
+        plot_obj <- plot_obj +
+          ggplot2::geom_polygon(
+            data = circle_polys,
+            mapping = ggplot2::aes(x = x, y = y, group = cluster_label, fill = cluster_label),
+            inherit.aes = FALSE,
+            color = "#475569",
+            alpha = cluster_alpha,
+            linewidth = 0.5
+          ) +
+          ggplot2::labs(fill = "Cluster")
+      }
     } else {
-      # When points use a separate color scale (proximity or category), use fill for cluster circles
-      # and a subtle border color so we don't conflict with the point color scale
-      plot_obj <- plot_obj +
-        ggplot2::geom_polygon(
-          data = circle_polys,
-          mapping = ggplot2::aes(x = x, y = y, group = cluster_label, fill = cluster_label),
-          inherit.aes = FALSE,
-          color = "#475569",
-          alpha = cluster_alpha,
-          linewidth = 0.5
-        ) +
-        ggplot2::labs(fill = "Cluster")
+      # No fill: draw outline paths only
+      if (!is.null(cluster_color) && length(cluster_color) == 1) {
+        plot_obj <- plot_obj +
+          ggplot2::geom_path(
+            data = circle_polys,
+            mapping = ggplot2::aes(x = x, y = y, group = cluster_label),
+            inherit.aes = FALSE,
+            color = cluster_color,
+            linewidth = 0.7
+          )
+      } else if (color_by %in% c("cluster", "none")) {
+        plot_obj <- plot_obj +
+          ggplot2::geom_path(
+            data = circle_polys,
+            mapping = ggplot2::aes(x = x, y = y, group = cluster_label, color = cluster_label),
+            inherit.aes = FALSE,
+            linewidth = 0.7,
+            show.legend = (color_by == "none")
+          )
+      } else {
+        # When color_by is proximity or category, color circles by cluster palette or neutral gray
+        plot_obj <- plot_obj +
+          ggplot2::geom_path(
+            data = circle_polys,
+            mapping = ggplot2::aes(x = x, y = y, group = cluster_label),
+            inherit.aes = FALSE,
+            color = "#64748b",
+            linewidth = 0.6
+          )
+      }
     }
   }
 
@@ -362,9 +393,12 @@ plot_speaker_landscapes <- function(speaker_landscape,
     plot_obj <- plot_obj +
       ggplot2::geom_point(ggplot2::aes(color = cluster_label), size = size_points, alpha = alpha_points) +
       ggplot2::scale_color_manual(values = cluster_color_map, drop = FALSE) +
-      ggplot2::scale_fill_manual(values = cluster_color_map, drop = FALSE) +
-      ggplot2::labs(color = eff_legend_title, fill = eff_legend_title) +
-      ggplot2::guides(fill = "none")
+      ggplot2::labs(color = eff_legend_title)
+    if (cluster_alpha > 0) {
+      plot_obj <- plot_obj +
+        ggplot2::scale_fill_manual(values = cluster_color_map, drop = FALSE) +
+        ggplot2::guides(fill = "none")
+    }
   } else {
     plot_obj <- plot_obj +
       ggplot2::geom_point(color = "#3b82f6", size = size_points, alpha = alpha_points)

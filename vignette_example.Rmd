@@ -115,12 +115,13 @@ anger_dict <- c("attack", "punish", "enemy", "harshly", "blackmail", "crush", "r
 centroid <- compute_dictionary_centroid(anger_dict, embedding)
 
 
-# 3. Interactive plot colored by cosine proximity with custom legend title
-plot_interactive_landscape(landscape,
-                           tokens_to_plot = anger_dict,
-                           centroid = centroid,
-                           embedding = embedding,
-                           proximity_palette = c("lightyellow", "darkred"))
+# 3. Plot colored by cosine proximity with custom legend title
+plot_speaker_landscapes(landscape,
+                         tokens_to_plot = anger_dict,
+                         centroid = centroid,
+                         embedding = embedding,
+                         proximity_palette = c("lightyellow", "darkred"),
+                         interactive = FALSE)
 ```
 
 ## 8) Extracting and plotting speaker clusters with HDBSCAN
@@ -129,7 +130,7 @@ You can identify density-based clusters of speakers on the 2D landscape using `e
 
 ```{r}
 # 1. Extract speaker clusters using HDBSCAN
-landscape <- extract_speaker_clusters(landscape, minPts = 15)
+landscape <- extract_speaker_clusters(landscape, minPts = 10)
 landscape$clusters
 
 # 2. Static landscape plot with cluster circles
@@ -137,12 +138,16 @@ plot_speaker_landscapes(landscape,
                         tokens_to_plot = frequent_words,
                         show_clusters = TRUE,
                         label_clusters = TRUE)
+```
 
+
+```{r, eval=FALSE}
 # 3. Interactive landscape plot with cluster circles
-plot_interactive_landscape(landscape,
-                           tokens_to_plot = frequent_words,
-                           show_clusters = TRUE,
-                           label_clusters = TRUE)
+plot_speaker_landscapes(landscape,
+                          tokens_to_plot = frequent_words,
+                          show_clusters = TRUE,
+                          label_clusters = TRUE, 
+                         interactive = TRUE)
 ```
 
 ## 9) Calculating proximity between cluster and dictionary centroids

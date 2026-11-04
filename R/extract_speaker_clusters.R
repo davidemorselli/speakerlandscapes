@@ -55,7 +55,7 @@
 #' }
 #' @export
 extract_speaker_clusters <- function(speaker_landscape,
-                                     minPts = 5,
+                                     minPts = 10,
                                      cluster_on = c("umap", "embedding"),
                                      embedding = NULL,
                                      radius_quantile = 0.95,
@@ -289,4 +289,3 @@ get_cluster_colors <- function(cluster_labels, cluster_palette = NULL, noise_col
 
   return(all_cols)
 }
-

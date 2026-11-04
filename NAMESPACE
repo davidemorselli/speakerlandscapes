@@ -3,8 +3,8 @@
 S3method(print,dictionary_centroid)
 export(calculate_centroid_distance)
 export(calculate_centroid_proximity)
-export(calculate_cluster_centroid_proximity)
 export(calculate_cluster_centroid_distance)
+export(calculate_cluster_centroid_proximity)
 export(compute_dictionary_centroid)
 export(create_bigrams)
 export(extract_speaker_clusters)
@@ -39,6 +39,7 @@ importFrom(ggplot2,
   aes,
   coord_fixed,
   element_blank,
+  geom_path,
   geom_point,
   geom_polygon,
   geom_text,

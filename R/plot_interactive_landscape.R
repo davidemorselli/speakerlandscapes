@@ -39,8 +39,8 @@
 #'   \code{\link{extract_speaker_clusters}} is called automatically with \code{minPts = cluster_minPts}.
 #' @param cluster_minPts Integer specifying \code{minPts} if \code{\link{extract_speaker_clusters}} is called
 #'   automatically when \code{show_clusters = TRUE} or \code{color_by = "cluster"}. Defaults to \code{5}.
-#' @param cluster_alpha Numeric value in \code{[0, 1]} specifying the fill opacity of the cluster circles.
-#'   Defaults to \code{0.12}.
+#' @param cluster_alpha Numeric value in \code{[0, 1]} specifying the fill opacity of the cluster circles/ellipses.
+#'   Defaults to \code{0} (unfilled outline circles).
 #' @param cluster_color Optional color (or vector of colors) for the cluster circles. If \code{NULL} (default),
 #'   clusters are colored distinctly using a consistent palette matching speaker points, while noise points are colored gray.
 #' @param noise_color Color string used for speakers assigned to the noise category (\code{"Noise"}).
@@ -106,7 +106,7 @@ plot_interactive_landscape <- function(speaker_landscape,
                                        legend_title = NULL,
                                        show_clusters = "auto",
                                        cluster_minPts = 5,
-                                       cluster_alpha = 0.12,
+                                       cluster_alpha = 0,
                                        cluster_color = NULL,
                                        noise_color = "#9ca3af",
                                        label_clusters = FALSE,
@@ -372,17 +372,15 @@ plot_interactive_landscape <- function(speaker_landscape,
 
       rgb_vals <- grDevices::col2rgb(col_hex)
       fill_rgba <- sprintf("rgba(%d,%d,%d,%.3f)", rgb_vals[1], rgb_vals[2], rgb_vals[3], cluster_alpha)
-      line_rgba <- sprintf("rgba(%d,%d,%d,%.3f)", rgb_vals[1], rgb_vals[2], rgb_vals[3], min(1, cluster_alpha * 3.5))
+      line_rgba <- sprintf("rgba(%d,%d,%d,%.3f)", rgb_vals[1], rgb_vals[2], rgb_vals[3], if (cluster_alpha > 0) min(1, cluster_alpha * 3.5) else 0.85)
 
-      p <- plotly::add_trace(
+      trace_args <- list(
         p,
         data = c_poly,
         x = ~x,
         y = ~y,
         type = "scatter",
         mode = "lines",
-        fill = "toself",
-        fillcolor = fill_rgba,
         line = list(color = line_rgba, width = 1.5),
         name = c_lbl,
         legendgroup = c_lbl,
@@ -393,6 +391,13 @@ plot_interactive_landscape <- function(speaker_landscape,
         ),
         showlegend = (color_by != "cluster")
       )
+
+      if (cluster_alpha > 0) {
+        trace_args$fill <- "toself"
+        trace_args$fillcolor <- fill_rgba
+      }
+
+      p <- do.call(plotly::add_trace, trace_args)
     }
   }
 
