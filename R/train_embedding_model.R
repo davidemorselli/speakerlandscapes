@@ -5,10 +5,10 @@
 #' function), trains the model, and finally saves the resulting
 #' vector embeddings to a specified file path.
 #'
-#' @param file_path A character string specifying the path to the raw input text file. The file should contain speaker identifier as the first token of each line in. Speakers identifiers should start with a non equivocal token (e.g., speaker_ID1, speaker_ID2, ...), see \code{prepare_data()}
+#' @param file_path A character string specifying the path to the raw input text file, or an object of class \code{"speakers_text"} created with \code{prepare_data()}. The file or text should contain a speaker identifier as the first token of each line.
 #' @param output_file A character string specifying the file path where the
 #'   trained Word2Vec model (\code{.emb} format) will be saved.
-#'   Defaults to \code{"embeddings.emb"}.
+#'   Defaults to \code{"embeddings.emb"}. If \code{NULL}, saving to disk is skipped.
 #' @param dim An integer specifying the dimensionality (vector size) of the
 #'   word embeddings. Defaults to \code{250}.
 #' @param window An integer specifying the context window size for the skip-gram model.
@@ -16,7 +16,7 @@
 #' @param min_count An integer specifying the minimum frequency required for a
 #'   token to be included in the vocabulary. Defaults to \code{5}.
 #' @param iter An integer specifying the number of training iterations (epochs).
-#'   Defaults to \code{15}.
+#'   Defaults to \code{20}.
 #' @param threads An integer specifying the number of CPU threads to use for
 #'   parallel computing during training. Defaults to \code{7}.
 #' @param seed An integer used to set the random seed for reproducibility.
@@ -26,27 +26,14 @@
 #'   Defaults to \code{"en"} (English). Use \code{NULL} to skip loading default stop words.
 #' @param custom_stopwords A character vector of additional stop words to
 #'   exclude from bigram formation. Defaults to \code{NULL}.
-#'
+#' @param ... Other parameters to be passed to \code{preprocess_data()}
 #' @return The trained \code{word2vec} model object (an S3 object of class \code{word2vec}).
 #'   The model is also saved to disk at the path specified by \code{output_file}.
-#'
-#' @details
-#' This function assumes the existence of two helper functions in the current R environment:
-#' 1. \code{preprocess_data()}: Loads and tokenizes the raw data. It must return a
-#'    list of character vectors (tokenized sentences).
-#' 2. \code{get_most_frequent_tokens()}: Used to identify the top tokens (though not directly
-#'    called in the training flow, it is typically used for downstream analysis).
 #'
 #' @importFrom word2vec word2vec write.word2vec
 #'
 #' @examples
 #' \dontrun{
-#' # Define placeholder helpers for a runnable example context
-#' preprocess_data <- function(data, share_data, stopwords_language, custom_stopwords) {
-#'   # Reads file and returns tokenized data
-#'   list(c("this", "is", "a", "test", "sentence"), c("another", "test", "sentence", "here"))
-#' }
-#'
 #' # Example file path (replace with actual path)
 #' dummy_file_path <- "corpus.txt"
 #'
@@ -78,7 +65,13 @@ train_embedding_model <- function(
 
   message("Starting preprocessing data")
   # Preprocessing function
-  training_data <- preprocess_data(file_path, share_data = 1.0, stopwords_language = stopwords_language, custom_stopwords = custom_stopwords)
+  training_data <- preprocess_data(
+    file_path,
+    share_data = 1.0,
+    stopwords_language = stopwords_language,
+    custom_stopwords = custom_stopwords,
+    ...
+  )
 
   # --- Model Training ---
   # Set seeds for reproducibility
@@ -95,12 +88,14 @@ train_embedding_model <- function(
     min_count = min_count,
     iter = iter,        # epochs
     threads = threads,   # CPU cores for parallel computing
-    verbose = T
+    verbose = TRUE
   )
 
-  # Save the model
-  word2vec::write.word2vec(model, output_file)
-  message(paste("Word2Vec model successfully saved to:", output_file))
+  # Save the model if output_file is provided
+  if (!is.null(output_file) && is.character(output_file) && nzchar(output_file)) {
+    word2vec::write.word2vec(model, output_file)
+    message(paste("Word2Vec model successfully saved to:", output_file))
+  }
 
   return(model)
 }

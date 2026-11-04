@@ -1,3 +1,11 @@
 ^speakerlandscapes\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^raw_corpus\.csv$
+^embeddings\.emb$
+^vignette_example\.Rmd$
+^vignette_example\.html$
+^vignette_example\.nb\.html$
+^\.Rhistory$
+^\.positai$
+^\.claude$

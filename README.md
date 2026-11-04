@@ -1,6 +1,6 @@
 # Speaker Landscape Analysis: Vector Space Mapping and Visualization
 
-This R packge ouline the pipeline for analyzing speaker similarities based on their language, as outlined in *Schuld, M., Durrheim, K., & Mafunda, M. (2024). Speaker landscapes: Machine learning opens a window on the everyday language of opinion. Communication Methods and Measures, 18(4), 315-331.*
+This R package outlines the pipeline for analyzing speaker similarities based on their language, as outlined in *Schuld, M., Durrheim, K., & Mafunda, M. (2024). Speaker landscapes: Machine learning opens a window on the everyday language of opinion. Communication Methods and Measures, 18(4), 315-331.*
 
 The procedure transforms raw text into a high-dimensional vector space using Word2Vec and subsequently reduces the data to a 2D "landscape" using UMAP for visual interpretation.
 
@@ -22,7 +22,7 @@ The initial text file (or character vector) is assumed to contain a speaker ID f
 
 2. **Speaker Token Creation:** A dedicated speaker token is created (e.g., `speaker_userA`) for each unique speaker ID.
 
-3. **Corpus Preparation:** The speaker token is prepended to every line of text, creating an input format like: `speaker_userA the quick brown fox`. This ensures that when the Word2Vec model is trained, it treats the`speaker_userA` as a valid token and learns a vector embedding for it based on the words that follow it. A speaker vector is thus created based on the language used by the speaker, and speakers are positioned in a vectorial space accroding to the semantic the refer to. 
+3. **Corpus Preparation:** The speaker token is prepended to every line of text, creating an input format like: `speaker_userA the quick brown fox`. This ensures that when the Word2Vec model is trained, it treats the `speaker_userA` as a valid token and learns a vector embedding for it based on the words that follow it. A speaker vector is thus created based on the language used by the speaker, and speakers are positioned in a vectorial space according to the semantics they refer to. 
 
 ### Advanced Tokenization (N-gram Substitution)
 
@@ -52,7 +52,7 @@ The result is a high-dimensional embedding matrix where the distance between any
 
 ## 4. Dimensionality Reduction (UMAP)
 
-To visualize and interpret the high-dimensional space, the `speaker_landscapes` function applies **Uniform Manifold Approximation and Projection (UMAP)**.
+To visualize and interpret the high-dimensional space, the `make_speaker_landscapes` function applies **Uniform Manifold Approximation and Projection (UMAP)**.
 
 ### UMAP Projection
 
@@ -62,15 +62,19 @@ To visualize and interpret the high-dimensional space, the `speaker_landscapes` 
 
 3. The coordinates are returned as separate data frames for speakers and words.
 
-## 5. Visualization (`plot_speaker_landscapes`)
+## 5. Visualization (`plot_speaker_landscapes` and `plot_interactive_landscape`)
 
-The final plot is generated to display the resulting **speaker landscape** in an interpretable format:
+The package provides both static (ggplot2) and interactive (Plotly + HTML inspector) visualization:
 
-* **Speaker Distribution:** Speakers are plotted as low-opacity points. The cluster density and position reveal groups of speakers with similar linguistic patterns.
+* **Speaker Distribution:** Speakers are plotted as points. The cluster density and position reveal groups of speakers with similar linguistic patterns.
 
 * **Thematic Labeling:** The selected `tokens_to_plot` (key words) are plotted as text labels on the same canvas. The position of these word labels indicates the thematic focus associated with nearby speaker clusters.
 
 * **Categorical Grouping (Optional):** If a separate `categories` data frame is provided, speakers are colored by their defined category, aiding in the interpretation of how pre-defined groups map onto the learned linguistic space.
+
+* **Concept Centroid Proximity (Optional):** Using `compute_dictionary_centroid()` and `calculate_centroid_proximity()`, you can supply a dictionary of terms (e.g., anger or climate tokens), compute the subset centroid in the embedding space, and color speakers by a continuous gradient of their **normalized cosine proximity** to this concept (where higher values indicate stronger semantic alignment).
+
+* **Interactive Inspector:** Setting `interactive = TRUE` in `plot_speaker_landscapes()` (or calling `plot_interactive_landscape()`) generates an interactive side-by-side view where **clicking on any speaker dot immediately reveals the speaker's original texts and quotes** in a scrollable panel.
 
 ## 6. Detailed Example and Walkthrough
 

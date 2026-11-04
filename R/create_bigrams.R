@@ -42,6 +42,8 @@
 #' @importFrom stringr str_replace_all
 #' @importFrom tidyr separate
 #' @importFrom stopwords stopwords
+#' @importFrom stats setNames
+#' @importFrom utils head
 #'
 #' @examples
 #' \dontrun{
@@ -65,12 +67,12 @@
 #' print(result$text)
 #' }
 #' @export
-create_bigrams <- function(data, text_col, n_bigrams = 10, stopwords_language="en",custom_stopwords=NULL) {
+create_bigrams <- function(data, text_col, n_bigrams = 10, stopwords_language="en", custom_stopwords=NULL) {
 
   # Note: The 'require()' calls are replaced by @importFrom tags for package development.
 
-  # Prepare combined stopword list
-  stopword_list <- stopwords::stopwords(language = stopwords_language)
+  # Prepare combined stopword list safely
+  stopword_list <- if (!is.null(stopwords_language)) stopwords::stopwords(language = stopwords_language) else character(0)
   stopwords_df <- tibble::tibble(word = c(stopword_list, custom_stopwords)) %>%
     dplyr::filter(!is.na(word))
 
@@ -87,10 +89,11 @@ create_bigrams <- function(data, text_col, n_bigrams = 10, stopwords_language="e
       n = 2
     ) %>%
 
-    dplyr::count(bigram, sort = TRUE) %>%
-    head(n_bigrams) %>%
-    # Separate words to allow stop word filtering
+    # Separate words to allow stop word filtering BEFORE ranking
     tidyr::separate(bigram, c("word1", "word2"), sep = " ") %>%
+
+    # Filter out NA/invalid bigrams
+    dplyr::filter(!is.na(word1) & !is.na(word2)) %>%
 
     # --- Stopword Removal using anti_join ---
     # Remove bigrams where word1 is a stop word
@@ -98,23 +101,14 @@ create_bigrams <- function(data, text_col, n_bigrams = 10, stopwords_language="e
     # Remove bigrams where word2 is a stop word
     dplyr::anti_join(stopwords_df, by = c("word2" = "word")) %>%
 
-    # Filter out NA/invalid bigrams
-    dplyr::filter(!is.na(word1) & !is.na(word2)) %>%
-
-    # Re-combine the words and count (to get final top N after filtering)
-    dplyr::mutate(bigram = paste(word1, word2, sep = " ")) %>%
-    dplyr::count(bigram, sort = TRUE) %>%
-    head(n_bigrams) %>%
-
-    # Separate back for replacement vector creation
-    tidyr::separate(bigram, c("word1", "word2"), sep = " ", fill = "right")
-
+    # Count real frequencies and select top N bigrams
+    dplyr::count(word1, word2, sort = TRUE) %>%
+    utils::head(n_bigrams)
 
   # Check if any bigrams were found
   if (nrow(bigram_counts) == 0) {
-    # warning("No valid bigrams found to combine. Returning original data.")
-    # Return original data with an alternative column name to avoid accidental overwrites
-    return(data %>% dplyr::mutate(text_combined = {{ text_col }}))
+    # Return original data with column named 'text' lowercased to avoid type mismatch
+    return(data %>% dplyr::mutate(text = tolower({{ text_col }})))
   }
 
   # 2. Prepare Replacement Vectors
@@ -122,16 +116,13 @@ create_bigrams <- function(data, text_col, n_bigrams = 10, stopwords_language="e
     dplyr::mutate(old_value = paste(word1, word2, sep = " "),
                   new_value = paste(word1, word2, sep = "_"))
 
-
   # Create a named vector for str_replace_all: c("old string" = "new string")
-  replacement_vector <- setNames(
+  replacement_vector <- stats::setNames(
     bigrams_to_combine$new_value,
     bigrams_to_combine$old_value
   )
 
   # 3. Apply Replacement to the Original Text
-
-  # Apply replacement, converting string to lowercase first
   result_df <- data %>%
     dplyr::mutate(
       text = stringr::str_replace_all(

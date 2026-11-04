@@ -27,7 +27,10 @@ Defaults to \code{"en"} (English). Use \code{NULL} to skip loading default stop 
 \item{custom_stopwords}{A character vector of additional stop words to
 exclude from bigram formation. Defaults to \code{NULL}.}
 
-\item{min_freq}{Minimum frequencies to replace pair of words with the respective bigrams. Defaults is \code{10}.}
+\item{min_freq}{An integer specifying the number of top bigrams/trigrams to
+replace with single tokens. Defaults to \code{10}.}
+
+\item{...}{Other parameters to be passed to \code{create_bigrams()}}
 }
 \value{
 A list where each element is a character vector representing a
@@ -40,22 +43,11 @@ function \code{create_bigrams}), and tokenizes the resulting text. Optionally, i
 subsamples the data.
 }
 \details{
-The function relies heavily on Tidyverse packages and requires an external function
-named \code{create_bigrams} to be defined in the search path.
-
 \code{create_bigrams} is called twice to perform bigram and then trigram substitution.
 }
 \examples{
 \dontrun{
-# Assuming 'text_data.txt' exists and 'create_bigrams' is defined:
-# The function requires an external helper function, e.g.:
-# create_bigrams <- function(data, text_col, n_bigrams) {
-#   # This is a placeholder and would contain the actual logic
-#   # for finding and replacing n-grams.
-#   return(data)
-# }
-
-# Full dataset
+# Full dataset from file
 preprocessed_full <- preprocess_data("path/to/text_data.txt")
 
 # Subsample 10\% of the data

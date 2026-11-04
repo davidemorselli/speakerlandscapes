@@ -6,7 +6,7 @@ output:
 ---
 ## 1) Import data. 
 
-Source data should have column with speaker identifiers (e.g., usernames) and one withe text (e.g., social media posts)
+Source data should have a column with speaker identifiers (e.g., usernames) and one with text (e.g., social media posts)
 
 ```{r}
 library(tidyverse)
@@ -19,7 +19,7 @@ head(data)
 ```
 ## 2) Make data ready to build landscapes.
 
-This create a \code{speakers_text} object: a character vector in which the first token is the speaker name, prefixed by an identifying token (e.g. "agent"). Bigrams and trigrams are found in the text and replaced by single tokens (e.g., word1_word2)
+This creates a `speakers_text` object: a character vector in which the first token is the speaker name, prefixed by an identifying token (e.g. "agent"). Bigrams and trigrams are found in the text and replaced by single tokens (e.g., word1_word2).
 
 ```{r}
 
@@ -34,22 +34,32 @@ head(ready_data)
 
 ## 3) Make the embedding
 
-Compute the embeddings from the \code{speakers_text} object.
+Compute the embeddings from the `speakers_text` object.
 
 ```{r}
 embedding = train_embedding_model(ready_data, 
-                                  min_count = 1,  #Beware, min_count=1 is only for the example. It indicate minimum frequency required for a token to be included in the vocabulary. A higher number is preferable
+                                  min_count = 1,  # Beware, min_count=1 is only for the example. It indicates the minimum frequency required for a token to be included in the vocabulary. A higher number is preferable.
                                   stopwords_language = "en")
 
 
 ```
 
+```{r}
+# Validate ! Validate ! Validate !
+# check embeddign by exracting simialr words to seed words
+library(word2vec)
+similar_words = predict(embedding, c("natural","protest"), type = "nearest", top_n = 10)
+
+similar_words
+
+```
+
 # 4) Make the speaker landscape.
 
-This step use UMAP to reduce the 250-dimension embedding to a more interpretable 2-dimension and extract speakers vectors. Other tokens present in the embedding can be also specified here to be plotted in the next step. In this exemple we use the \code{get_most_frequent_tokens()} function to extract the words that appear at least 10 times in the text. 
+This step uses UMAP to reduce the 250-dimension embedding to a more interpretable 2-dimension space and extract speaker vectors.
 
 ```{r}
-landscape = make_speaker_landscapes(data = ready_data ,
+landscape = make_speaker_landscapes(data = ready_data,
                                     embedding = embedding, 
                                     speaker_identifier = "agent",
                                     retain_threshold = 1,
@@ -61,7 +71,7 @@ landscape = make_speaker_landscapes(data = ready_data ,
 
 ## 5) Plot the speaker landscape.
 
-Plot the speaker landscape along with word tokens specified in the previous step.
+Plot the speaker landscape along with word tokens extracted using `get_most_frequent_tokens()`.
 
 ```{r}
 frequent_words = get_most_frequent_tokens(ready_data, min_count = 10, stopwords_language = "en")
@@ -70,7 +80,7 @@ categories = data %>%
   select(speaker, opinion) %>% 
   rename(author = speaker,
          categories = opinion) %>% 
-  mutate(author = paste0("agent_",author))
+  mutate(author = tolower(paste0("agent_", author)))
 
 plot_speaker_landscapes(landscape,
                         tokens_to_plot = frequent_words,
@@ -78,4 +88,40 @@ plot_speaker_landscapes(landscape,
                         categories = categories)
 
 ```
+
+## 6) Interactive landscape with click-to-view speaker texts
+
+You can inspect what individual speakers said by clicking on their dots in an interactive visualization.
+Use `plot_speaker_landscapes(..., interactive = TRUE)` or call `plot_interactive_landscape()` directly:
+
+```{r}
+# Click on any speaker dot to see their original texts in the inspector side panel
+plot_speaker_landscapes(landscape,
+                        tokens_to_plot = frequent_words,
+                        categories = categories,
+                        interactive = TRUE)
+```
+
+## 7) Coloring speakers by normalized cosine proximity to a dictionary centroid
+
+You can project a thematic concept (e.g., anger, climate, optimism) into the embedding space by calculating the centroid of its dictionary tokens, and visualize speakers colored by their **normalized cosine proximity** (where higher values = stronger alignment with the concept).
+
+```{r}
+# 1. Define a dictionary of concept tokens
+anger_dict <- c("attack", "punish", "enemy", "harshly", "blackmail", "crush", "ridiculous", "arrogant")
+
+# 2. Compute the dictionary centroid in embedding space
+centroid <- compute_dictionary_centroid(anger_dict, embedding)
+
+
+# 3. Interactive plot colored by cosine proximity with custom legend title
+plot_interactive_landscape(landscape,
+                           tokens_to_plot = anger_dict,
+                           centroid = centroid,
+                           embedding = embedding,
+                           proximity_palette = c("lightyellow", "darkred"))
+```
+
+
+
 

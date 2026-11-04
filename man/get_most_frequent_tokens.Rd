@@ -8,23 +8,23 @@ get_most_frequent_tokens(
   data,
   n_top = 100,
   min_count = 100,
-  stopword_language = "en",
+  stopwords_language = "en",
   custom_stopwords = NULL,
   min_freq = 10
 )
 }
 \arguments{
-\item{n_top}{The number of top tokens to return. Defaults to 100.}
+\item{data}{Original corpus.}
+
+\item{n_top}{The (approximated) number of top words to be listed. Defaults to 100.}
 
 \item{min_count}{The minimum number of times a token must appear. Defaults to 100.}
 
-\item{stopword_language}{The language for the stopwords. Defaults to "en".}
+\item{stopwords_language}{The language for the stopwords. Defaults to "en".}
 
 \item{custom_stopwords}{A character vector of additional stop words to remove.}
 
 \item{min_freq}{Minimum frequencies to replace pair of words with the respective bigrams. Defaults is \code{10}.}
-
-\item{token_list}{A list of character vectors (tokenized documents).}
 }
 \value{
 A tibble with columns 'token' and 'n' (count), sorted by frequency.

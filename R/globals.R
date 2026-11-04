@@ -1,0 +1,25 @@
+# Declare global variables to satisfy R CMD check notes for tidyverse NSE columns
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(
+    c(
+      ".",
+      ".data",
+      "X1",
+      "X2",
+      "author",
+      "bigram",
+      "n_quotes",
+      "speaker",
+      "text",
+      "token",
+      "word",
+      "word1",
+      "word2",
+      "words",
+      "quote",
+      "centroid_distance",
+      "centroid_proximity",
+      "cosine_similarity"
+    )
+  )
+}

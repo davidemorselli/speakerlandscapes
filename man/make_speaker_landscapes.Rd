@@ -7,7 +7,6 @@
 make_speaker_landscapes(
   data,
   embedding = NULL,
-  tokens_to_plot = NULL,
   speaker_identifier = "speaker",
   retain_threshold = 1,
   umap_seed = 42,
@@ -17,17 +16,13 @@ make_speaker_landscapes(
 }
 \arguments{
 \item{data}{The input source. Can be either a character string specifying the path to
-the file contianing text (The first token is assumed to be the speaker ID, and the rest forms the text.) OR an object of class \code{"speakers_text"} as create with \code{prepare_data()}).}
+the file containing text (The first token is assumed to be the speaker ID, and the rest forms the text.) OR an object of class \code{"speakers_text"} as created with \code{prepare_data()}.}
 
 \item{embedding}{A pre-trained vector embeddings object (e.g., a matrix of
 word2vec embeddings) where \code{rownames} contain the tokens/speakers being mapped.}
 
-\item{tokens_to_plot}{A data frame or tibble with a column named \code{token}
-containing a character vector of tokens (e.g., important words) whose
-embeddings should also be reduced and plotted as labels.}
-
 \item{speaker_identifier}{A character string prefix used to identify the
-speaker tokens. This is used in the internal filtering step and it is transposed to low case. Defaults to \code{"speaker"}.}
+speaker tokens. This is converted to lower case. Defaults to \code{"speaker"}.}
 
 \item{retain_threshold}{An integer threshold for the minimum number of
 quotes a speaker must have to be included in the final plot. Defaults to \code{1}.}
@@ -36,23 +31,22 @@ quotes a speaker must have to be included in the final plot. Defaults to \code{1
 to ensure reproducibility. Defaults to \code{42}.}
 
 \item{n_neighbors}{UMAP hyperparameter. An integer specifying the number of nearest neighbors for
-the UMAP algorithm. Defaults to \code{10}. This parameter controls how UMAP balances local versus global structure in the data.
-It does this by constraining the size of the local neighborhood UMAP will look at when attempting to learn the manifold structure of the data.
-Low values of n_neighbors will force UMAP to concentrate on very local structure, potentially to the detriment of the big picture
-, while large values may lose fine detail structure. For more information see \ref{https://umap-learn.readthedocs.io/en/latest/parameters.html}.}
+the UMAP algorithm. Defaults to \code{40}. This parameter controls how UMAP balances local versus global structure in the data.
+Low values of n_neighbors will force UMAP to concentrate on very local structure, while large values may lose fine detail structure.
+For more information see \url{https://umap-learn.readthedocs.io/en/latest/parameters.html}.}
 
 \item{min_dist}{UMAP hyperparameter. A numeric value specifying the minimum distance parameter for
 the UMAP algorithm. Defaults to \code{0.01}. It provides the minimum distance that points are allowed to be in the low dimensional representation.
-Low values of min_dist will result in clumpier embeddings. This can be useful if you are interested in clustering, or in finer topological structure.
-Larger values of min_dist will prevent UMAP from packing points together and will focus on the preservation of the broad topological structure instead. For more information see \ref{https://umap-learn.readthedocs.io/en/latest/parameters.html}.}
+Low values of min_dist will result in clumpier embeddings. Larger values of min_dist will prevent UMAP from packing points together.
+For more information see \url{https://umap-learn.readthedocs.io/en/latest/parameters.html}.}
 }
 \value{
 A \code{list} containing two tibbles:
 \itemize{
 \item \code{speakers}: Data for the filtered speakers, including \code{author},
-\code{n_quotes}, and UMAP coordinates (\code{X1}, \code{X2}).
-\item \code{words}: Data for the \code{tokens_to_plot}, including \code{words}
-(the token) and UMAP coordinates (\code{X1}, \code{X2}).
+\code{n_quotes}, \code{quotes} (list of original text segments for each speaker), and UMAP coordinates (\code{X1}, \code{X2}).
+\item \code{all_tokens}: Data for all mapped tokens (words and speakers) including \code{token}
+and UMAP coordinates (\code{X1}, \code{X2}).
 }
 }
 \description{
@@ -66,8 +60,8 @@ both the filtered speakers and a set of input tokens for visualization.
 The function relies on \code{tidyverse}, \code{umap}, and requires the
 \code{embedding} object to be a matrix compatible with the UMAP input.
 
-\strong{Input Flexibility:} If \code{class(data)} is \code{"speakers_text"}, the
-input is treated as an inline character vector; otherwise, it is treated as a file path.
+\strong{Input Flexibility:} If \code{inherits(data, "speakers_text")}, the
+input is treated as an inline character vector; otherwise, if a valid file path, it is read line-by-line.
 }
 \examples{
 \dontrun{
@@ -75,7 +69,6 @@ library(dplyr)
 library(umap)
 
 # 1. Setup Dummy Data
-# Create a dummy text vector and set its class for inline processing
 dummy_text_vector <- c(
   "speaker_A this is the first quote",
   "speaker_B second quote here",
@@ -83,30 +76,24 @@ dummy_text_vector <- c(
   "speaker_A another quote",
   "speaker_C fifth quote"
 )
-class(dummy_text_vector) <- "speakers_text"
+class(dummy_text_vector) <- c("speakers_text", "character")
 
 # Create dummy embeddings (assuming 5 tokens/authors and 10 dimensions)
-vocab <- c("speaker_A", "speaker_B", "speaker_C", "word1", "word2")
+vocab <- c("speaker_a", "speaker_b", "speaker_c", "word1", "word2")
 dummy_embedding <- matrix(
   rnorm(length(vocab) * 10),
   nrow = length(vocab),
   dimnames = list(vocab, NULL)
 )
 
-# Create dummy tokens to plot
-dummy_tokens_to_plot <- tibble(token = c("word1", "word2"))
-
 # 2. Run the processing function
-landscape_data <- speaker_landscapes(
+landscape_data <- make_speaker_landscapes(
   data = dummy_text_vector,
   embedding = dummy_embedding,
-  tokens_to_plot = dummy_tokens_to_plot,
+  speaker_identifier = "speaker",
   retain_threshold = 2
 )
 print(landscape_data$speakers)
-print(landscape_data$words)
-
-# 3. Plot the result (requires plot_speaker_landscapes function)
-# plot_speaker_landscapes(landscape_data)
+print(landscape_data$all_tokens)
 }
 }

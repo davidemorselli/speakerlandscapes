@@ -19,11 +19,11 @@ train_embedding_model(
 )
 }
 \arguments{
-\item{file_path}{A character string specifying the path to the raw input text file. The file should contain speaker identifier as the first token of each line in. Speakers identifiers should start with a non equivocal token (e.g., speaker_ID1, speaker_ID2, ...), see \code{prepare_data()}}
+\item{file_path}{A character string specifying the path to the raw input text file, or an object of class \code{"speakers_text"} created with \code{prepare_data()}. The file or text should contain a speaker identifier as the first token of each line.}
 
 \item{output_file}{A character string specifying the file path where the
 trained Word2Vec model (\code{.emb} format) will be saved.
-Defaults to \code{"embeddings.emb"}.}
+Defaults to \code{"embeddings.emb"}. If \code{NULL}, saving to disk is skipped.}
 
 \item{dim}{An integer specifying the dimensionality (vector size) of the
 word embeddings. Defaults to \code{250}.}
@@ -35,7 +35,7 @@ Defaults to \code{10}.}
 token to be included in the vocabulary. Defaults to \code{5}.}
 
 \item{iter}{An integer specifying the number of training iterations (epochs).
-Defaults to \code{15}.}
+Defaults to \code{20}.}
 
 \item{threads}{An integer specifying the number of CPU threads to use for
 parallel computing during training. Defaults to \code{7}.}
@@ -49,6 +49,8 @@ Defaults to \code{"en"} (English). Use \code{NULL} to skip loading default stop 
 
 \item{custom_stopwords}{A character vector of additional stop words to
 exclude from bigram formation. Defaults to \code{NULL}.}
+
+\item{...}{Other parameters to be passed to \code{preprocess_data()}}
 }
 \value{
 The trained \code{word2vec} model object (an S3 object of class \code{word2vec}).
@@ -60,23 +62,8 @@ model. It first preprocesses the raw text data (using the \code{preprocess_data}
 function), trains the model, and finally saves the resulting
 vector embeddings to a specified file path.
 }
-\details{
-This function assumes the existence of two helper functions in the current R environment:
-\enumerate{
-\item \code{preprocess_data()}: Loads and tokenizes the raw data. It must return a
-list of character vectors (tokenized sentences).
-\item \code{get_most_frequent_tokens()}: Used to identify the top tokens (though not directly
-called in the training flow, it is typically used for downstream analysis).
-}
-}
 \examples{
 \dontrun{
-# Define placeholder helpers for a runnable example context
-preprocess_data <- function(data, share_data, stopwords_language, custom_stopwords) {
-  # Reads file and returns tokenized data
-  list(c("this", "is", "a", "test", "sentence"), c("another", "test", "sentence", "here"))
-}
-
 # Example file path (replace with actual path)
 dummy_file_path <- "corpus.txt"
 

@@ -4,10 +4,10 @@
 #' and returns a tibble of the most frequent tokens and their counts.
 #' Words to be removed can be standard stopwords (from stopwords/quanteda) or a custom list.
 #'
-#' @param token_list A list of character vectors (tokenized documents).
-#' @param n_top The number of top tokens to return. Defaults to 100.
+#' @param data Original corpus.
+#' @param n_top The (approximated) number of top words to be listed. Defaults to 100.
 #' @param min_count The minimum number of times a token must appear. Defaults to 100.
-#' @param stopword_language The language for the stopwords. Defaults to "en".
+#' @param stopwords_language The language for the stopwords. Defaults to "en".
 #' @param custom_stopwords A character vector of additional stop words to remove.
 #' @param min_freq Minimum frequencies to replace pair of words with the respective bigrams. Defaults is \code{10}.
 #'
@@ -15,7 +15,7 @@
 #'
 #' @importFrom quanteda tokens tokens_remove dfm topfeatures
 #' @importFrom dplyr %>% rename filter select
-#' @importFrom tibble tibble rownames_to_column
+#' @importFrom tibble tibble enframe
 #' @importFrom stringr str_detect
 #' @importFrom stopwords stopwords
 #'
@@ -40,9 +40,12 @@
 get_most_frequent_tokens <- function(data, n_top = 100, min_count = 100, stopwords_language = "en",
                                      custom_stopwords = NULL, min_freq=10) {
 
-  # 1. Convert the list of vectors into a quanteda tokens object
-  # quanteda::tokens() is designed to handle lists of character vectors efficiently.
-  token_list <- preprocess_data(data, stopwords_language = stopwords_language, custom_stopwords = custom_stopwords, min_freq = min_freq)
+  # 1. Convert the input into a quanteda tokens object
+  if (is.list(data) && !is.data.frame(data)) {
+    token_list <- data
+  } else {
+    token_list <- preprocess_data(data, stopwords_language = stopwords_language, custom_stopwords = custom_stopwords, min_freq = min_freq)
+  }
 
   # Check if the list is empty
   if (length(token_list) == 0 || all(sapply(token_list, length) == 0)) {
@@ -54,29 +57,33 @@ get_most_frequent_tokens <- function(data, n_top = 100, min_count = 100, stopwor
   toks <- quanteda::tokens(token_list)
 
   # 2. Remove Stopwords
-  # Combine default and custom stopwords
-  all_stopwords <- c(stopwords::stopwords(stopwords_language), custom_stopwords)
+  stopword_list <- if (!is.null(stopwords_language)) stopwords::stopwords(language = stopwords_language) else character(0)
+  all_stopwords <- c(stopword_list, custom_stopwords)
 
-  # Use quanteda::tokens_remove for efficient stopword filtering
-  toks_clean <- quanteda::tokens_remove(
-    toks,
-    pattern = all_stopwords
-  )
+  if (length(all_stopwords) > 0) {
+    toks_clean <- quanteda::tokens_remove(
+      toks,
+      pattern = all_stopwords
+    )
+  } else {
+    toks_clean <- toks
+  }
 
   # 3. Create a Document-Feature Matrix (DFM) and get feature frequencies
   dfmat <- quanteda::dfm(toks_clean)
 
   # Get feature (token) frequencies, sorted
-  token_frequencies <- quanteda::topfeatures(dfmat, n = n_top) %>%
-    as.data.frame() %>%
-    dplyr::rename(n = '.') %>%
-    tibble::rownames_to_column("token") %>%
+  feats <- quanteda::topfeatures(dfmat, n = n_top)
+  if (length(feats) == 0) {
+    return(tibble::tibble(token = character(0), n = integer(0)))
+  }
+
+  token_frequencies <- feats %>%
+    tibble::enframe(name = "token", value = "n") %>%
     # Apply minimum count filter
     dplyr::filter(n >= min_count) %>%
-
     # Remove obvious noise (URLs, single-letter/number tokens, etc.)
     dplyr::filter(!stringr::str_detect(token, "^http|^@|\\d$|\\s|\\W$|^[[:punct:]]$|^[[:digit:]]$|^.$")) %>%
-
     # Select the final top N tokens
     dplyr::select(token, n)
 
