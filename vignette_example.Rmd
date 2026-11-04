@@ -10,7 +10,7 @@ Source data should have a column with speaker identifiers (e.g., usernames) and 
 
 ```{r}
 library(tidyverse)
-#devtools::install_github("davidemorselli/speakerlandscapes")
+devtools::install_github("davidemorselli/speakerlandscapes")
 library(speakerlandscapes)
 
 data = read_csv2("raw_corpus.csv")
