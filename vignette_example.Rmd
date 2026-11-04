@@ -10,6 +10,7 @@ Source data should have a column with speaker identifiers (e.g., usernames) and 
 
 ```{r}
 library(tidyverse)
+Sys.unsetenv("GITHUB_PAT")
 devtools::install_github("davidemorselli/speakerlandscapes")
 library(speakerlandscapes)
 

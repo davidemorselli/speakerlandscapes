@@ -4,6 +4,7 @@ S3method(print,dictionary_centroid)
 export(calculate_centroid_distance)
 export(calculate_centroid_proximity)
 export(calculate_cluster_centroid_distance)
+export(calculate_cluster_centroid_proximity)
 export(compute_dictionary_centroid)
 export(create_bigrams)
 export(extract_speaker_clusters)
@@ -27,6 +28,7 @@ importFrom(dplyr,
   left_join,
   mutate,
   n,
+  pull,
   rename,
   row_number,
   select,

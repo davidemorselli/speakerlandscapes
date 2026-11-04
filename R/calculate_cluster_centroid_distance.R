@@ -43,8 +43,8 @@
 #'     \item \code{n_speakers}: Number of speakers in the cluster.
 #'     \item \code{center_x}, \code{center_y}, \code{radius}: 2D coordinates and circle radius.
 #'     \item \code{cosine_similarity}: Raw cosine similarity between cluster vector centroid and dictionary centroid (when \code{space \%in\% c("embedding", "both")}).
-#'     \item \code{dist_2d}: 2D Euclidean distance between cluster 2D center and dictionary 2D centroid (when \code{space \%in\% c("umap_2d", "both")}).
 #'     \item \code{centroid_proximity} or \code{centroid_distance}: Embedding proximity (or distance if \code{metric = "cosine_distance"}).
+#'     \item \code{dist_2d}: 2D Euclidean distance between cluster 2D center and dictionary 2D centroid (when \code{space \%in\% c("umap_2d", "both")}).
 #'   }
 #'   If \code{speaker_landscape} was passed as a full list, the updated list is also accessible via the
 #'   attribute \code{"speaker_landscape"}, and \code{speaker_landscape$clusters} is updated with these columns.
