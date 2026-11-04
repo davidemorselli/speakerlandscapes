@@ -74,6 +74,10 @@ The package provides both static (ggplot2) and interactive (Plotly + HTML inspec
 
 * **Concept Centroid Proximity (Optional):** Using `compute_dictionary_centroid()` and `calculate_centroid_proximity()`, you can supply a dictionary of terms (e.g., anger or climate tokens), compute the subset centroid in the embedding space, and color speakers by a continuous gradient of their **normalized cosine proximity** to this concept (where higher values indicate stronger semantic alignment).
 
+* **HDBSCAN Speaker Clustering (Optional):** Using `extract_speaker_clusters()`, you can extract density-based clusters of speakers via `dbscan::hdbscan()` and visualize each cluster on the 2D landscape as a circle whose position and radius reflect the 2D spatial spread of its member speakers (`show_clusters = TRUE`).
+
+* **Cluster Centroid Proximity (Optional):** Using `calculate_cluster_centroid_proximity()` (or `calculate_cluster_centroid_distance()`), you can compute the normalized cosine proximity (or cosine distance/similarity) and 2D spatial distance between each speaker cluster's centroid and a target dictionary centroid.
+
 * **Interactive Inspector:** Setting `interactive = TRUE` in `plot_speaker_landscapes()` (or calling `plot_interactive_landscape()`) generates an interactive side-by-side view where **clicking on any speaker dot immediately reveals the speaker's original texts and quotes** in a scrollable panel.
 
 ## 6. Detailed Example and Walkthrough

@@ -3,8 +3,10 @@
 S3method(print,dictionary_centroid)
 export(calculate_centroid_distance)
 export(calculate_centroid_proximity)
+export(calculate_cluster_centroid_distance)
 export(compute_dictionary_centroid)
 export(create_bigrams)
+export(extract_speaker_clusters)
 export(get_most_frequent_tokens)
 export(make_speaker_landscapes)
 export(plot_interactive_landscape)
@@ -12,10 +14,13 @@ export(plot_speaker_landscapes)
 export(prepare_data)
 export(preprocess_data)
 export(train_embedding_model)
+importFrom(dbscan,hdbscan)
 importFrom(dplyr,
   "%>%",
   anti_join,
   any_of,
+  arrange,
+  bind_rows,
   count,
   filter,
   group_by,
@@ -30,17 +35,24 @@ importFrom(dplyr,
 )
 importFrom(ggplot2,
   aes,
+  coord_fixed,
   element_blank,
   geom_point,
+  geom_polygon,
   geom_text,
   ggplot,
+  guide_legend,
+  guides,
   labs,
   scale_color_distiller,
   scale_color_gradientn,
+  scale_color_manual,
   scale_color_viridis_c,
+  scale_fill_manual,
   theme,
   theme_minimal
 )
+importFrom(grDevices,col2rgb)
 importFrom(htmltools,
   browsable,
   htmlEscape,
@@ -61,7 +73,12 @@ importFrom(quanteda,
   topfeatures
 )
 importFrom(readr,read_lines)
-importFrom(stats,setNames)
+importFrom(stats,
+  dist,
+  quantile,
+  sd,
+  setNames
+)
 importFrom(stopwords,stopwords)
 importFrom(stringr,
   str_detect,

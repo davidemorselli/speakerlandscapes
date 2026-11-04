@@ -104,7 +104,7 @@ plot_speaker_landscapes(landscape,
 
 ## 7) Coloring speakers by normalized cosine proximity to a dictionary centroid
 
-You can project a thematic concept (e.g., anger, climate, optimism) into the embedding space by calculating the centroid of its dictionary tokens, and visualize speakers colored by their **normalized cosine proximity** (where higher values = stronger alignment with the concept).
+You can project a thematic concept (e.g., anger, climate, optimism) into the embedding space by calculating the centroid of its dictionary tokens, and visualize speakers colored by their **cosine proximity** (where higher values = stronger alignment with the concept).
 
 ```{r}
 # 1. Define a dictionary of concept tokens
@@ -121,6 +121,47 @@ plot_interactive_landscape(landscape,
                            embedding = embedding,
                            proximity_palette = c("lightyellow", "darkred"))
 ```
+
+## 8) Extracting and plotting speaker clusters with HDBSCAN
+
+You can identify density-based clusters of speakers on the 2D landscape using `extract_speaker_clusters()` (powered by `dbscan::hdbscan()`), and plot the clusters on the landscape. `minPts` (minimum size) is the parameter that controls how conservative or sensitive the clustering is to noise. It controls how clusters are formed and how much data gets thrown out as noise. High values (e.g., minPts = 10) are recommended in noisy datasets (like word embeddings or text) where you only want the most definitive clusters.
+
+```{r}
+# 1. Extract speaker clusters using HDBSCAN
+landscape <- extract_speaker_clusters(landscape, minPts = 15)
+landscape$clusters
+
+# 2. Static landscape plot with cluster circles
+plot_speaker_landscapes(landscape,
+                        tokens_to_plot = frequent_words,
+                        show_clusters = TRUE,
+                        label_clusters = TRUE)
+
+# 3. Interactive landscape plot with cluster circles
+plot_interactive_landscape(landscape,
+                           tokens_to_plot = frequent_words,
+                           show_clusters = TRUE,
+                           label_clusters = TRUE)
+```
+
+## 9) Calculating proximity between cluster and dictionary centroids
+
+You can measure how semantically aligned each speaker cluster is to a thematic dictionary concept (such as anger or climate tokens) using `calculate_cluster_centroid_proximity()` (or `calculate_cluster_centroid_distance()`). It shows you the cosine similarity and the Euclidean distance between the cluster centroide and the thematic concept.
+
+```{r}
+# Calculate normalized cosine proximity between cluster centroids and the anger dictionary centroid
+cluster_proximity <- calculate_cluster_centroid_proximity(
+  speaker_landscape = landscape,
+  centroid = centroid,
+  embedding = embedding,
+  space = "both"
+)
+
+cluster_proximity %>% 
+  select(cluster_label,n_speakers,cosine_similarity,dist_2d)
+```
+
+
 
 
 

@@ -23,15 +23,30 @@
 #' @param embedding Optional vector embeddings matrix, \code{word2vec} model, or file path to an .emb file.
 #'   Required if \code{centroid} or \code{dictionary} is provided.
 #' @param color_by Character string specifying how to color speaker points:
-#'   \code{"auto"} (default: colors by proximity if available, otherwise by category),
+#'   \code{"auto"} (default: colors by proximity if available, otherwise by category, or by cluster if clusters are present),
 #'   \code{"proximity"} (continuous gradient of cosine proximity to centroid),
-#'   \code{"category"} (discrete categories), or \code{"none"}.
+#'   \code{"category"} (discrete categories),
+#'   \code{"cluster"} (HDBSCAN clusters from \code{\link{extract_speaker_clusters}}), or \code{"none"}.
 #'   (\code{"distance"} is also accepted for backward compatibility).
 #' @param proximity_palette Character string specifying the color palette for proximity gradient:
 #'   \code{"Viridis"} (default), \code{"Plasma"}, \code{"Inferno"}, \code{"Magma"}, \code{"Cividis"}, etc.
 #' @param distance_palette Alias for \code{proximity_palette} for backward compatibility. Defaults to \code{NULL}.
 #' @param legend_title Optional character string specifying a custom title for the plot legend / colorbar.
-#'   If \code{NULL} (default), uses the variable name of the aesthetic being plotted (e.g., \code{"centroid_proximity"} or \code{"categories"}).
+#'   If \code{NULL} (default), uses the variable name of the aesthetic being plotted (e.g., \code{"centroid_proximity"}, \code{"categories"}, or \code{"cluster"}).
+#' @param show_clusters Logical or \code{"auto"}. If \code{TRUE} (or \code{"auto"} when \code{speaker_landscape$clusters} is present),
+#'   draws a circle around each HDBSCAN cluster on the 2D landscape whose size (radius) depends on the
+#'   locations of its member speakers on the 2D plot. If \code{TRUE} and clusters have not yet been extracted,
+#'   \code{\link{extract_speaker_clusters}} is called automatically with \code{minPts = cluster_minPts}.
+#' @param cluster_minPts Integer specifying \code{minPts} if \code{\link{extract_speaker_clusters}} is called
+#'   automatically when \code{show_clusters = TRUE} or \code{color_by = "cluster"}. Defaults to \code{5}.
+#' @param cluster_alpha Numeric value in \code{[0, 1]} specifying the fill opacity of the cluster circles.
+#'   Defaults to \code{0.12}.
+#' @param cluster_color Optional color (or vector of colors) for the cluster circles. If \code{NULL} (default),
+#'   clusters are colored distinctly using a consistent palette matching speaker points, while noise points are colored gray.
+#' @param noise_color Color string used for speakers assigned to the noise category (\code{"Noise"}).
+#'   Defaults to \code{"#9ca3af"} (gray).
+#' @param label_clusters Logical. If \code{TRUE}, displays cluster labels at the center of each cluster circle.
+#'   Defaults to \code{FALSE}.
 #' @param size_points A numeric value specifying the size of the speaker points in the plot.
 #'   Defaults to \code{7}.
 #' @param alpha_points A numeric value specifying the opacity of the speaker points (between 0 and 1).
@@ -51,6 +66,7 @@
 #' @importFrom htmltools browsable tagList tags htmlEscape
 #' @importFrom dplyr %>% mutate left_join filter rename any_of select group_by summarise
 #' @importFrom tibble tibble
+#' @importFrom grDevices col2rgb
 #'
 #' @examples
 #' \dontrun{
@@ -78,21 +94,27 @@
 #' }
 #' @export
 plot_interactive_landscape <- function(speaker_landscape,
-                                      tokens_to_plot = NULL,
-                                      categories = NULL,
-                                      speaker_texts = NULL,
-                                      centroid = NULL,
-                                      dictionary = NULL,
-                                      embedding = NULL,
-                                      color_by = c("auto", "proximity", "category", "distance", "none"),
-                                      proximity_palette = "Viridis",
-                                      distance_palette = NULL,
-                                      legend_title = NULL,
-                                      size_points = 7,
-                                      alpha_points = 0.75,
-                                      colors = NULL,
-                                      height = "620px",
-                                      width = "100%") {
+                                       tokens_to_plot = NULL,
+                                       categories = NULL,
+                                       speaker_texts = NULL,
+                                       centroid = NULL,
+                                       dictionary = NULL,
+                                       embedding = NULL,
+                                       color_by = c("auto", "proximity", "category", "cluster", "distance", "none"),
+                                       proximity_palette = "Viridis",
+                                       distance_palette = NULL,
+                                       legend_title = NULL,
+                                       show_clusters = "auto",
+                                       cluster_minPts = 5,
+                                       cluster_alpha = 0.12,
+                                       cluster_color = NULL,
+                                       noise_color = "#9ca3af",
+                                       label_clusters = FALSE,
+                                       size_points = 7,
+                                       alpha_points = 0.75,
+                                       colors = NULL,
+                                       height = "620px",
+                                       width = "100%") {
 
   color_by <- match.arg(color_by)
 
@@ -124,8 +146,26 @@ plot_interactive_landscape <- function(speaker_landscape,
     }
   }
 
+  # Check if clusters exist or need to be computed
+  has_clusters <- !is.null(speaker_landscape$clusters) || "cluster" %in% colnames(speaker_landscape$speakers)
+  if ((isTRUE(show_clusters) || color_by == "cluster") && !has_clusters) {
+    speaker_landscape <- extract_speaker_clusters(
+      speaker_landscape = speaker_landscape,
+      minPts = cluster_minPts,
+      embedding = embedding
+    )
+    has_clusters <- TRUE
+  }
+
+  draw_clusters <- if (identical(show_clusters, "auto")) {
+    !is.null(speaker_landscape$clusters) && nrow(speaker_landscape$clusters) > 0
+  } else {
+    isTRUE(show_clusters)
+  }
+
   # Extract speaker data
   df_speakers <- speaker_landscape$speakers
+  clusters_df <- speaker_landscape$clusters
 
   if (is.null(df_speakers) || nrow(df_speakers) == 0) {
     stop("The provided speaker_landscape does not contain any speaker coordinates in $speakers.")
@@ -133,6 +173,37 @@ plot_interactive_landscape <- function(speaker_landscape,
 
   # Ensure author is character
   df_speakers$author <- as.character(df_speakers$author)
+
+  # Ensure cluster_label exists if cluster column is present
+  if ("cluster" %in% colnames(df_speakers) && !"cluster_label" %in% colnames(df_speakers)) {
+    df_speakers$cluster_label <- ifelse(
+      df_speakers$cluster == 0,
+      "Noise",
+      paste0("Cluster ", df_speakers$cluster)
+    )
+  }
+
+  # If cluster column exists in df_speakers but clusters_df was not precomputed, compute summary
+  if (draw_clusters && (is.null(clusters_df) || nrow(clusters_df) == 0) && "cluster" %in% colnames(df_speakers)) {
+    clustered_sub <- df_speakers %>% dplyr::filter(cluster > 0)
+    if (nrow(clustered_sub) > 0) {
+      clusters_df <- clustered_sub %>%
+        dplyr::group_by(cluster, cluster_label) %>%
+        dplyr::summarise(
+          n_speakers = dplyr::n(),
+          center_x = mean(X1, na.rm = TRUE),
+          center_y = mean(X2, na.rm = TRUE),
+          radius = as.numeric(
+            stats::quantile(
+              sqrt((X1 - mean(X1, na.rm = TRUE))^2 + (X2 - mean(X2, na.rm = TRUE))^2),
+              probs = 0.95,
+              na.rm = TRUE
+            )
+          ) * 1.05,
+          .groups = "drop"
+        )
+    }
+  }
 
   # Check available proximity or distance column
   prox_candidates <- grep("(_proximity|_distance)$", colnames(df_speakers), value = TRUE)
@@ -163,6 +234,8 @@ plot_interactive_landscape <- function(speaker_landscape,
       color_by <- "proximity"
     } else if (!is.null(categories)) {
       color_by <- "category"
+    } else if ("cluster_label" %in% colnames(df_speakers)) {
+      color_by <- "cluster"
     } else if (has_proximity) {
       color_by <- "proximity"
     } else {
@@ -236,6 +309,17 @@ plot_interactive_landscape <- function(speaker_landscape,
     low_dim_words <- speaker_landscape$words
   }
 
+  # Ensure cluster_label factor order if present: Cluster 1, Cluster 2, ..., Noise
+  cluster_color_map <- NULL
+  if ("cluster_label" %in% colnames(df_speakers)) {
+    all_cluster_labs <- unique(c(df_speakers$cluster_label, if (!is.null(clusters_df)) clusters_df$cluster_label else character(0)))
+    cluster_color_map <- get_cluster_colors(all_cluster_labs, cluster_palette = if (!is.null(cluster_color)) cluster_color else colors, noise_color = noise_color)
+    df_speakers$cluster_label <- factor(df_speakers$cluster_label, levels = names(cluster_color_map))
+    if (!is.null(clusters_df) && nrow(clusters_df) > 0) {
+      clusters_df$cluster_label <- factor(clusters_df$cluster_label, levels = names(cluster_color_map))
+    }
+  }
+
   # Build quotes lookup for JavaScript
   quotes_lookup <- list()
   for (i in seq_len(nrow(df_speakers))) {
@@ -247,6 +331,7 @@ plot_interactive_landscape <- function(speaker_landscape,
     quotes_lookup[[auth]] <- list(
       author = auth,
       category = as.character(df_speakers$categories[i]),
+      cluster = if ("cluster_label" %in% colnames(df_speakers) && !is.na(df_speakers$cluster_label[i])) as.character(df_speakers$cluster_label[i]) else NULL,
       centroid_proximity = if ("centroid_proximity" %in% colnames(df_speakers) && !is.na(df_speakers$centroid_proximity[i])) as.numeric(df_speakers$centroid_proximity[i]) else if (has_proximity && !is.na(df_speakers[[prox_col]][i])) as.numeric(df_speakers[[prox_col]][i]) else NULL,
       centroid_distance = if ("centroid_distance" %in% colnames(df_speakers) && !is.na(df_speakers$centroid_distance[i])) as.numeric(df_speakers$centroid_distance[i]) else NULL,
       n_quotes = as.integer(df_speakers$n_quotes[i]),
@@ -259,8 +344,57 @@ plot_interactive_landscape <- function(speaker_landscape,
   plot_div_id <- paste0("plot_", uid)
   panel_div_id <- paste0("panel_", uid)
 
-  # Create Plotly figure
-  p <- plotly::plot_ly()
+  # Create Plotly figure initializing colors if color_by == "cluster"
+  if (color_by == "cluster" && !is.null(cluster_color_map)) {
+    p <- plotly::plot_ly(colors = cluster_color_map)
+  } else {
+    p <- plotly::plot_ly()
+  }
+
+  # Add Cluster Circles on 2D landscape if requested
+  if (draw_clusters && !is.null(clusters_df) && nrow(clusters_df) > 0) {
+    circle_polys <- build_cluster_circle_polygons(clusters_df)
+    unique_clusters <- unique(clusters_df$cluster)
+
+    for (idx in seq_along(unique_clusters)) {
+      cid <- unique_clusters[idx]
+      c_poly <- circle_polys %>% dplyr::filter(cluster == cid)
+      c_info <- clusters_df %>% dplyr::filter(cluster == cid)
+      c_lbl <- as.character(c_info$cluster_label[1])
+
+      col_hex <- if (!is.null(cluster_color_map) && c_lbl %in% names(cluster_color_map)) {
+        cluster_color_map[[c_lbl]]
+      } else if (!is.null(cluster_color)) {
+        cluster_color[(idx - 1) %% length(cluster_color) + 1]
+      } else {
+        "#3b82f6"
+      }
+
+      rgb_vals <- grDevices::col2rgb(col_hex)
+      fill_rgba <- sprintf("rgba(%d,%d,%d,%.3f)", rgb_vals[1], rgb_vals[2], rgb_vals[3], cluster_alpha)
+      line_rgba <- sprintf("rgba(%d,%d,%d,%.3f)", rgb_vals[1], rgb_vals[2], rgb_vals[3], min(1, cluster_alpha * 3.5))
+
+      p <- plotly::add_trace(
+        p,
+        data = c_poly,
+        x = ~x,
+        y = ~y,
+        type = "scatter",
+        mode = "lines",
+        fill = "toself",
+        fillcolor = fill_rgba,
+        line = list(color = line_rgba, width = 1.5),
+        name = c_lbl,
+        legendgroup = c_lbl,
+        hoverinfo = "text",
+        text = sprintf(
+          "<b>%s</b><br>Speakers: %d<br>Radius: %.3f",
+          c_lbl, c_info$n_speakers[1], c_info$radius[1]
+        ),
+        showlegend = (color_by != "cluster")
+      )
+    }
+  }
 
   # Determine effective legend title (custom text or variable name if NULL)
   eff_legend_title <- if (!is.null(legend_title)) {
@@ -269,6 +403,8 @@ plot_interactive_landscape <- function(speaker_landscape,
     prox_col
   } else if (color_by == "category") {
     "categories"
+  } else if (color_by == "cluster") {
+    "cluster"
   } else {
     NULL
   }
@@ -294,6 +430,7 @@ plot_interactive_landscape <- function(speaker_landscape,
       text = ~paste0(
         "<b>Speaker:</b> ", author,
         if ("categories" %in% colnames(df_speakers) && any(categories != "Uncategorized")) paste0("<br><b>Category:</b> ", categories) else "",
+        if ("cluster_label" %in% colnames(df_speakers)) paste0("<br><b>Cluster:</b> ", cluster_label) else "",
         "<br><b>", eff_legend_title, ":</b> ", sprintf("%.3f", get(prox_col)),
         "<br><b>Texts:</b> ", n_quotes,
         "<br><span style='color:#777; font-size:11px;'>\U0001F446 Click to view texts</span>"
@@ -319,6 +456,34 @@ plot_interactive_landscape <- function(speaker_landscape,
       text = ~paste0(
         "<b>Speaker:</b> ", author,
         "<br><b>Category:</b> ", categories,
+        if ("cluster_label" %in% colnames(df_speakers)) paste0("<br><b>Cluster:</b> ", cluster_label) else "",
+        if ("centroid_distance" %in% colnames(df_speakers)) paste0("<br><b>Distance to centroid:</b> ", sprintf("%.3f", centroid_distance)) else "",
+        "<br><b>Texts:</b> ", n_quotes,
+        "<br><span style='color:#777; font-size:11px;'>\U0001F446 Click to view texts</span>"
+      ),
+      hoverinfo = "text"
+    )
+  } else if (color_by == "cluster" && "cluster_label" %in% colnames(df_speakers)) {
+    p <- plotly::add_trace(
+      p,
+      data = df_speakers,
+      x = ~X1,
+      y = ~X2,
+      type = "scatter",
+      mode = "markers",
+      color = ~cluster_label,
+      colors = cluster_color_map,
+      legendgroup = ~as.character(cluster_label),
+      customdata = ~author,
+      marker = list(
+        size = size_points,
+        opacity = alpha_points,
+        line = list(width = 0.5, color = "rgba(255,255,255,0.8)")
+      ),
+      text = ~paste0(
+        "<b>Speaker:</b> ", author,
+        "<br><b>Cluster:</b> ", cluster_label,
+        if ("categories" %in% colnames(df_speakers) && any(categories != "Uncategorized")) paste0("<br><b>Category:</b> ", categories) else "",
         if ("centroid_distance" %in% colnames(df_speakers)) paste0("<br><b>Distance to centroid:</b> ", sprintf("%.3f", centroid_distance)) else "",
         "<br><b>Texts:</b> ", n_quotes,
         "<br><span style='color:#777; font-size:11px;'>\U0001F446 Click to view texts</span>"
@@ -342,11 +507,29 @@ plot_interactive_landscape <- function(speaker_landscape,
       customdata = ~author,
       text = ~paste0(
         "<b>Speaker:</b> ", author,
+        if ("cluster_label" %in% colnames(df_speakers)) paste0("<br><b>Cluster:</b> ", cluster_label) else "",
         if ("centroid_distance" %in% colnames(df_speakers)) paste0("<br><b>Distance to centroid:</b> ", sprintf("%.3f", centroid_distance)) else "",
         "<br><b>Texts:</b> ", n_quotes,
         "<br><span style='color:#777; font-size:11px;'>\U0001F446 Click to view texts</span>"
       ),
       hoverinfo = "text"
+    )
+  }
+
+  # Add Cluster Labels at circle centers if requested
+  if (draw_clusters && isTRUE(label_clusters) && !is.null(clusters_df) && nrow(clusters_df) > 0) {
+    p <- plotly::add_trace(
+      p,
+      data = clusters_df,
+      x = ~center_x,
+      y = ~center_y,
+      type = "scatter",
+      mode = "text",
+      text = ~cluster_label,
+      textposition = "middle center",
+      textfont = list(color = "#0f172a", size = 12, family = "system-ui, -apple-system, sans-serif"),
+      hoverinfo = "none",
+      showlegend = FALSE
     )
   }
 
@@ -444,6 +627,11 @@ function(el, x, data) {
       proxBadge = '<span style=\"font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 9999px; background: #fef3c7; color: #92400e; white-space: nowrap;\">Dist: ' + Number(info.centroid_distance).toFixed(3) + '</span>';
     }
 
+    var clusterBadge = '';
+    if (info.cluster) {
+      clusterBadge = '<span style=\"font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 9999px; background: #f3e8ff; color: #6b21a8; white-space: nowrap;\">' + info.cluster + '</span>';
+    }
+
     panel.innerHTML =
       '<div style=\"padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;\">' +
         '<div style=\"display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;\">' +
@@ -453,6 +641,7 @@ function(el, x, data) {
           '</div>' +
           '<div style=\"display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;\">' +
             (info.category && info.category !== 'Uncategorized' ? '<span style=\"font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 9999px; background: #e0f2fe; color: #0369a1; white-space: nowrap;\">' + info.category + '</span>' : '') +
+            clusterBadge +
             proxBadge +
           '</div>' +
         '</div>' +

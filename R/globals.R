@@ -19,7 +19,14 @@ if (getRversion() >= "2.15.1") {
       "quote",
       "centroid_distance",
       "centroid_proximity",
-      "cosine_similarity"
+      "cosine_similarity",
+      "cluster",
+      "cluster_label",
+      "center_x",
+      "center_y",
+      "radius",
+      "x",
+      "y"
     )
   )
 }

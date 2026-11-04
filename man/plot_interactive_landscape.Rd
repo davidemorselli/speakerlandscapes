@@ -12,10 +12,16 @@ plot_interactive_landscape(
   centroid = NULL,
   dictionary = NULL,
   embedding = NULL,
-  color_by = c("auto", "proximity", "category", "distance", "none"),
+  color_by = c("auto", "proximity", "category", "cluster", "distance", "none"),
   proximity_palette = "Viridis",
   distance_palette = NULL,
   legend_title = NULL,
+  show_clusters = "auto",
+  cluster_minPts = 5,
+  cluster_alpha = 0.12,
+  cluster_color = NULL,
+  noise_color = "#9ca3af",
+  label_clusters = FALSE,
   size_points = 7,
   alpha_points = 0.75,
   colors = NULL,
@@ -50,9 +56,10 @@ its centroid is computed automatically and used to color points by cosine proxim
 Required if \code{centroid} or \code{dictionary} is provided.}
 
 \item{color_by}{Character string specifying how to color speaker points:
-\code{"auto"} (default: colors by proximity if available, otherwise by category),
+\code{"auto"} (default: colors by proximity if available, otherwise by category, or by cluster if clusters are present),
 \code{"proximity"} (continuous gradient of cosine proximity to centroid),
-\code{"category"} (discrete categories), or \code{"none"}.
+\code{"category"} (discrete categories),
+\code{"cluster"} (HDBSCAN clusters from \code{\link{extract_speaker_clusters}}), or \code{"none"}.
 (\code{"distance"} is also accepted for backward compatibility).}
 
 \item{proximity_palette}{Character string specifying the color palette for proximity gradient:
@@ -61,7 +68,27 @@ Required if \code{centroid} or \code{dictionary} is provided.}
 \item{distance_palette}{Alias for \code{proximity_palette} for backward compatibility. Defaults to \code{NULL}.}
 
 \item{legend_title}{Optional character string specifying a custom title for the plot legend / colorbar.
-If \code{NULL} (default), uses the variable name of the aesthetic being plotted (e.g., \code{"centroid_proximity"} or \code{"categories"}).}
+If \code{NULL} (default), uses the variable name of the aesthetic being plotted (e.g., \code{"centroid_proximity"}, \code{"categories"}, or \code{"cluster"}).}
+
+\item{show_clusters}{Logical or \code{"auto"}. If \code{TRUE} (or \code{"auto"} when \code{speaker_landscape$clusters} is present),
+draws a circle around each HDBSCAN cluster on the 2D landscape whose size (radius) depends on the
+locations of its member speakers on the 2D plot. If \code{TRUE} and clusters have not yet been extracted,
+\code{\link{extract_speaker_clusters}} is called automatically with \code{minPts = cluster_minPts}.}
+
+\item{cluster_minPts}{Integer specifying \code{minPts} if \code{\link{extract_speaker_clusters}} is called
+automatically when \code{show_clusters = TRUE} or \code{color_by = "cluster"}. Defaults to \code{5}.}
+
+\item{cluster_alpha}{Numeric value in \code{[0, 1]} specifying the fill opacity of the cluster circles.
+Defaults to \code{0.12}.}
+
+\item{cluster_color}{Optional color (or vector of colors) for the cluster circles. If \code{NULL} (default),
+clusters are colored distinctly using a consistent palette matching speaker points, while noise points are colored gray.}
+
+\item{noise_color}{Color string used for speakers assigned to the noise category (\code{"Noise"}).
+Defaults to \code{"#9ca3af"} (gray).}
+
+\item{label_clusters}{Logical. If \code{TRUE}, displays cluster labels at the center of each cluster circle.
+Defaults to \code{FALSE}.}
 
 \item{size_points}{A numeric value specifying the size of the speaker points in the plot.
 Defaults to \code{7}.}
